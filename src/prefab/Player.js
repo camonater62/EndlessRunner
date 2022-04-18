@@ -12,6 +12,25 @@ class Player extends Phaser.GameObjects.Sprite {
             frames: this.anims.generateFrameNames(texture, {start: 0, end: 1, first: 0}),
             frameRate: 30
         });
+
+        /*
+this.enemyTimer = this.time.addEvent({
+            delay: 500,
+            callback: () => {
+                this.addEnemy(0, game.config.width / 2);
+            }, loop: true
+        });
+        */
+        this.shootTimer = scene.time.addEvent({
+            delay: 250,
+            callback: () => {
+            //    console.log("SHOOTING");
+                scene.addBullet();
+            },
+            loop: true,
+            paused: true,
+            startAt: 250
+        });
     }
 
     update() {
@@ -32,7 +51,18 @@ class Player extends Phaser.GameObjects.Sprite {
             this.y += this.speed;
         }
 
-        // TODO: Shoot
+        if (keySpace.isDown) {
+            if (this.shootTimer.paused) {
+                // Let player immediately shoot when they press space
+                // Is spammable; problem?
+                this.shootTimer.paused = false;
+                this.shootTimer.callback();
+                this.shootTimer.elapsed = 0;
+            }
+        }
+        if (keySpace.isUp) {
+            this.shootTimer.paused = true;
+        }
 
         this.y = max(min(game.config.height, this.y), 0);
         this.x = max(min(game.config.width, this.x), 0);
