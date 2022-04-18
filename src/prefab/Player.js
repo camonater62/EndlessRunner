@@ -4,7 +4,7 @@ class Player extends Phaser.GameObjects.Sprite {
 
         scene.add.existing(this);
 
-        this.scale = 0.5;
+        this.scale = 0.5; // Would like to avoid this
 
         this.anims.create({
             key: 'animation',
