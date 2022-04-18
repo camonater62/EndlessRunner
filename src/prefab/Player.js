@@ -1,10 +1,11 @@
 class Player extends Phaser.GameObjects.Sprite {
-    constructor(scene, x, y, texture, frame) {
+    constructor(scene, x, y, texture, frame, speed) {
         super(scene, x, y, texture, frame);
 
         scene.add.existing(this);
 
         this.scale = 0.5; // Would like to avoid this
+        this.speed = speed;
 
         this.anims.create({
             key: 'animation',
@@ -19,16 +20,19 @@ class Player extends Phaser.GameObjects.Sprite {
         }
 
         if (keyLEFT.isDown) {
-            this.x -= 4;
+            this.x -= this.speed;
         }
         if (keyRIGHT.isDown) {
-            this.x += 4;
+            this.x += this.speed;
         }
         if (keyUP.isDown) {
-            this.y -= 4;
+            this.y -= this.speed;
         }
         if (keyDOWN.isDown) {
-            this.y += 4;
+            this.y += this.speed;
         }
+
+        this.y = max(min(game.config.height, this.y), 0);
+        this.x = max(min(game.config.width, this.x), 0);
     }
 }
