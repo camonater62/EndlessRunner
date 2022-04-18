@@ -11,6 +11,8 @@ class Play extends Phaser.Scene {
         keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
         keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
 
+        keySpace = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+
         // this.load.image('player', './assets/player-0.png');
         this.load.spritesheet('player', './assets/player.png', {
             frameWidth: 222, 
@@ -46,7 +48,14 @@ class Play extends Phaser.Scene {
             }
         });
 
-        this.addEnemy(0, game.config.width / 2);
+        // this.addEnemy(0, game.config.width / 2);
+
+        this.enemyTimer = this.time.addEvent({
+            delay: 500,
+            callback: () => {
+                this.addEnemy(0, Math.random() * game.config.width);
+            }, loop: true
+        });
     }
 
     update() {
@@ -60,8 +69,10 @@ class Play extends Phaser.Scene {
                 
             }
         }, this);
+        // TODO: collisions
         // TODO: Set up timers to add enemies (different types)
-        this.addEnemy(0, Math.random() * game.config.width);
+        // TODO: pass in config
+        // this.addEnemy(0, Math.random() * game.config.width);
     }
 
     // Object pooling based off:
@@ -72,6 +83,7 @@ class Play extends Phaser.Scene {
             enemy = this.enemyPool.getFirst();
             enemy.x = posX;
             enemy.y = 0;
+            enemy.time = 0;
             enemy.active = true;
             enemy.visible = true;
             this.enemyPool.remove(enemy);
@@ -80,8 +92,12 @@ class Play extends Phaser.Scene {
                 texture: 'enemy1',
                 startFrame: 0,
                 endFrame: 1,
-                speed: 5,
-                shootInterval: 5
+                speed: 3,
+                shootInterval: 0,
+                moveFunction: (enemy) => {
+                   enemy.y += enemy.speed;
+                   enemy.x += 150 * cos(2 * enemy.time) / game.config.fps;
+                } 
             });
             this.enemyGroup.add(enemy);
         }

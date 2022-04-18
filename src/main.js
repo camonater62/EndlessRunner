@@ -23,5 +23,8 @@ if (highScore === null) {
 let game = new Phaser.Game(config);
 
 // reserve keyboard vars
+// Movement
 let keyW, keyA, keyS, keyD;
 let keyLEFT, keyRIGHT, keyUP, keyDOWN;
+// Shooting
+let keySpace;

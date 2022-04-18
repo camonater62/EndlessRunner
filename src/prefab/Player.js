@@ -32,6 +32,8 @@ class Player extends Phaser.GameObjects.Sprite {
             this.y += this.speed;
         }
 
+        // TODO: Shoot
+
         this.y = max(min(game.config.height, this.y), 0);
         this.x = max(min(game.config.width, this.x), 0);
     }
