@@ -19,6 +19,11 @@ class Enemy extends Phaser.GameObjects.Sprite {
     }
 
     update() {
+
+        if (!this.anims.isPlaying) {
+            this.anims.play('animation');
+        }
+        
         this.y += this.speed;
     }
 }

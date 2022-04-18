@@ -27,7 +27,7 @@ class Play extends Phaser.Scene {
     }
 
     create() {
-        this.player = new Player(this, game.config.width / 2, 3 * game.config.height / 4, 'player', 0).setOrigin(0.5, 0);
+        this.player = new Player(this, game.config.width / 2, 3 * game.config.height / 4, 'player', 0, 10).setOrigin(0.5, 0.5);
 
         // Object pooling based off:
         // https://www.emanueleferonato.com/2018/11/13/build-a-html5-endless-runner-with-phaser-in-a-few-lines-of-code-using-arcade-physics-and-featuring-object-pooling/
@@ -42,12 +42,23 @@ class Play extends Phaser.Scene {
             }
         });
 
-        this.enemy = new Enemy(this, game.config.width / 2, game.config.height / 4, 'enemy1', 0, 0, 5, 5).setOrigin(0.5, 0);
+        this.addEnemy(0, game.config.width / 2);
     }
 
     update() {
         this.player.update();
-        this.enemy.update();
+    //    this.enemy.update();
+        this.enemyGroup.getChildren().forEach((enemy)=>{
+            enemy.update();
+            if (enemy.y >= game.config.height) {
+                this.enemyGroup.killAndHide(enemy);
+                this.enemyGroup.remove(enemy);
+                
+            }
+        }, this);
+        // TODO: Set up timers to add enemies (different types)
+        this.addEnemy(0, Math.random() * game.config.width);
+        // console.log(this.enemyGroup.getLength() + this.enemyPool.getLength());
     }
 
     // Object pooling based off:
@@ -57,11 +68,12 @@ class Play extends Phaser.Scene {
         if (this.enemyPool.getLength()) {
             enemy = this.enemyPool.getFirst();
             enemy.x = posX;
-        //    enemy.active = true;
-        //    enemy.visible = true;
+            enemy.y = 0;
+            enemy.active = true;
+            enemy.visible = true;
             this.enemyPool.remove(enemy);
         } else {
-            enemy = new Enemy(posX);
+            enemy = new Enemy(this, posX, 0, 'enemy1', 0, enemyType, 5, 5);
             this.enemyGroup.add(enemy);
         }
         // TODO: When to spawn next enemy

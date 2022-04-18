@@ -1,5 +1,12 @@
 /** @type {import("../typings/phaser")} */
 
+
+// I don't like typing 'Math.'
+const max = Math.max;
+const min = Math.min;
+const sin = Math.sin;
+const cos = Math.cos;
+
 let config = {
     type: Phaser.AUTO,
     width: 720,
