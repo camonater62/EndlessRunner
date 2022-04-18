@@ -19,16 +19,16 @@ class Player extends Phaser.GameObjects.Sprite {
             this.anims.play('animation');
         }
 
-        if (keyLEFT.isDown) {
+        if (keyLEFT.isDown || keyA.isDown) {
             this.x -= this.speed;
         }
-        if (keyRIGHT.isDown) {
+        if (keyRIGHT.isDown || keyD.isDown) {
             this.x += this.speed;
         }
-        if (keyUP.isDown) {
+        if (keyUP.isDown || keyW.isDown) {
             this.y -= this.speed;
         }
-        if (keyDOWN.isDown) {
+        if (keyDOWN.isDown || keyS.isDown) {
             this.y += this.speed;
         }
 

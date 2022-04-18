@@ -6,6 +6,11 @@ class Play extends Phaser.Scene {
         keyLEFT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
         keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
 
+        keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
+        keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+        keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
+        keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+
         // this.load.image('player', './assets/player-0.png');
         this.load.spritesheet('player', './assets/player.png', {
             frameWidth: 222, 
@@ -13,7 +18,6 @@ class Play extends Phaser.Scene {
             startFrame: 0, 
             endFrame: 1
         });
-        // 34, 26
         this.load.spritesheet('enemy1', './assets/firstenemy.png', {
             frameWidth: 34,
             frameHeight: 26,
@@ -47,10 +51,10 @@ class Play extends Phaser.Scene {
 
     update() {
         this.player.update();
-    //    this.enemy.update();
+
         this.enemyGroup.getChildren().forEach((enemy)=>{
             enemy.update();
-            if (enemy.y >= game.config.height) {
+            if (enemy.deathFunction(enemy)) {
                 this.enemyGroup.killAndHide(enemy);
                 this.enemyGroup.remove(enemy);
                 
@@ -58,7 +62,6 @@ class Play extends Phaser.Scene {
         }, this);
         // TODO: Set up timers to add enemies (different types)
         this.addEnemy(0, Math.random() * game.config.width);
-        // console.log(this.enemyGroup.getLength() + this.enemyPool.getLength());
     }
 
     // Object pooling based off:
@@ -73,10 +76,15 @@ class Play extends Phaser.Scene {
             enemy.visible = true;
             this.enemyPool.remove(enemy);
         } else {
-            enemy = new Enemy(this, posX, 0, 'enemy1', 0, enemyType, 5, 5);
+            enemy = new Enemy(this, posX, 0, {
+                texture: 'enemy1',
+                startFrame: 0,
+                endFrame: 1,
+                speed: 5,
+                shootInterval: 5
+            });
             this.enemyGroup.add(enemy);
         }
-        // TODO: When to spawn next enemy
     }
     
 }

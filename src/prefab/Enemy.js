@@ -1,29 +1,44 @@
-class Enemy extends Phaser.GameObjects.Sprite {
-    constructor(scene, x, y, texture, frame, enemyType, speed, shootInterval) {
-        super(scene, x, y, texture, frame);
+const defaultDeathCondition = (enemy) => {
+    return enemy.y > game.config.height;
+};
 
-        this.enemyType = enemyType;
+const defaultMovement = (enemy) => {
+    enemy.y += enemy.speed;
+}
+
+class Enemy extends Phaser.GameObjects.Sprite {
+    constructor(scene, x, y, {texture, startFrame, endFrame, speed, shootInterval, deathFunction=defaultDeathCondition, moveFunction=defaultMovement}) {
+        super(scene, x, y, texture, startFrame);
+
         this.speed = speed;
         this.shootInterval = shootInterval;
-        // TODO: Handle enemy type
+        // this.dead = false;
+        this.deathFunction = deathFunction;
+        this.moveFunction = moveFunction;
+        // TODO: Add more to enemy config (behaviour)
 
         scene.add.existing(this);
 
-        // this.scale = 0.5;
-
         this.anims.create({
             key: 'animation',
-            frames: this.anims.generateFrameNames(texture, {start: 0, end: 1, first: 0}),
-            frameRate: 30
+            frames: this.anims.generateFrameNames(texture, {
+                start: startFrame, 
+                end: endFrame, 
+            }),
+            frameRate: 20
         });
     }
 
     update() {
+        // TODO: Check collision
 
         if (!this.anims.isPlaying) {
             this.anims.play('animation');
         }
-        
-        this.y += this.speed;
+
+        // this.y += this.speed;
+        this.moveFunction(this);
+
+        // this.dead = this.deathFunction(this);
     }
 }
