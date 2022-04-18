@@ -2,9 +2,9 @@
 
 let config = {
     type: Phaser.AUTO,
-    width: 640,
-    height: 480,
-    scene: [Menu, Play],
+    width: 720,
+    height: 960,
+    scene: [Play],
     fps: 60,
 };
 
@@ -16,4 +16,4 @@ if (highScore === null) {
 let game = new Phaser.Game(config);
 
 // reserve keyboard vars
-let keyF, keyR, keyLEFT, keyRIGHT;
+let keyLEFT, keyRIGHT, keyUP, keyDOWN;
