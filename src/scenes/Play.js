@@ -50,12 +50,7 @@ class Play extends Phaser.Scene {
 
         this.load.image('bullet', './assets/bullet.png');
 
-        this.enemyTimer = this.time.addEvent({
-            delay: 500,
-            callback: () => {
-                this.addEnemy(0, game.config.width / 2);
-            }, loop: true
-        });
+        
         this.load.image('ocean', './assets/ocean.png');
     }
 
@@ -90,7 +85,12 @@ class Play extends Phaser.Scene {
         // TODO: Set up timers to add enemies (different types)
         // TODO: pass in config
         // this.addEnemy(0, Math.random() * game.config.width);
-
+        this.enemyTimer = this.time.addEvent({
+            delay: 500,
+            callback: () => {
+                this.addEnemy(0, game.config.width / 2);
+            }, loop: true
+        });
 
         // TODO: Draw Player on top
         this.player = new Player(this, game.config.width / 2, 3 * game.config.height / 4, 'player', 0, 10).setOrigin(0.5, 0.5);
@@ -119,11 +119,15 @@ class Play extends Phaser.Scene {
 
         this.bulletGroup.getChildren().forEach((bullet) => {
             bullet.update();
-            bullet.checkCollision(this.enemyGroup);
-            if (bullet.y < 0) {
+            let enemy = bullet.checkCollision(this.enemyGroup);
+            if (enemy || bullet.y < 0) {
                 // TODO: more advanced kill condition
                 this.bulletGroup.killAndHide(bullet);
                 this.bulletGroup.remove(bullet);
+            }
+            if (enemy) {
+                this.enemyGroup.killAndHide(enemy);
+                this.enemyGroup.remove(enemy);
             }
         }, this);
         // TODO: collisions

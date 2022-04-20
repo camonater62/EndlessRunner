@@ -16,6 +16,7 @@ class Bullet extends Phaser.GameObjects.Sprite {
     }
 
     checkCollision(enemyGroup) {
+        let hit = null;
         enemyGroup.getChildren().forEach((enemy) => {
             // AABB checking
             if (this.x < enemy.x + enemy.width && 
@@ -24,11 +25,15 @@ class Bullet extends Phaser.GameObjects.Sprite {
                 this.y + this.height > enemy.y) {
                     console.log("pew");
                     this.hit(enemy);
-                    return true;
-            } else {
-                return false;
-            }            
+                    hit = enemy;
+                }
+            
+                    //       return true;
+            //} else {
+            //    return false;
+           // }            
         });
+        return hit;
     }
 
     hit(enemy) {
