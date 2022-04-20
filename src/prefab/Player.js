@@ -1,30 +1,27 @@
 class Player extends Phaser.GameObjects.Sprite {
+
+    // TODO: config table
     constructor(scene, x, y, texture, frame, speed) {
         super(scene, x, y, texture, frame);
 
         scene.add.existing(this);
 
-        this.scale = 0.5; // Would like to avoid this
+        this.texture.setFilter('NEAREST');
+        this.scale = 0.6; // Would like to avoid this
+
+
         this.speed = speed;
 
         this.anims.create({
             key: 'animation',
             frames: this.anims.generateFrameNames(texture, {start: 0, end: 1, first: 0}),
-            frameRate: 30
+            frameRate: 20
         });
 
-        /*
-this.enemyTimer = this.time.addEvent({
-            delay: 500,
-            callback: () => {
-                this.addEnemy(0, game.config.width / 2);
-            }, loop: true
-        });
-        */
+        // Add to config
         this.shootTimer = scene.time.addEvent({
-            delay: 250,
+            delay: 300,
             callback: () => {
-            //    console.log("SHOOTING");
                 scene.addBullet();
             },
             loop: true,
@@ -63,6 +60,7 @@ this.enemyTimer = this.time.addEvent({
         if (keySpace.isUp) {
             this.shootTimer.paused = true;
         }
+
 
         this.y = max(min(game.config.height, this.y), 0);
         this.x = max(min(game.config.width, this.x), 0);
