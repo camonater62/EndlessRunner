@@ -7,7 +7,7 @@ class Player extends Phaser.GameObjects.Sprite {
         scene.add.existing(this);
 
         this.texture.setFilter('NEAREST');
-        this.scale = 0.6; // Would like to avoid this
+        //this.scale = 0.6; // Would like to avoid this
 
 
         this.speed = speed;
@@ -20,7 +20,7 @@ class Player extends Phaser.GameObjects.Sprite {
 
         // Add to config
         this.shootTimer = scene.time.addEvent({
-            delay: 300,
+            delay: 150,
             callback: () => {
                 scene.addBullet();
             },
@@ -62,7 +62,7 @@ class Player extends Phaser.GameObjects.Sprite {
         }
 
 
-        this.y = max(min(game.config.height, this.y), 0);
-        this.x = max(min(game.config.width, this.x), 0);
+        this.y = max(min(game.config.height - this.height / 2, this.y), -this.height / 2);
+        this.x = max(min(game.config.width - this.width / 2, this.x), -this.width / 2);
     }
 }

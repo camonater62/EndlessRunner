@@ -18,8 +18,8 @@ class Play extends Phaser.Scene {
 
         // this.load.image('player', './assets/player-0.png');
         this.load.spritesheet('player', './assets/player.png', {
-            frameWidth: 222, 
-            frameHeight: 102, 
+            frameWidth: 111, 
+            frameHeight: 51, 
             startFrame: 0, 
             endFrame: 1
         });
@@ -168,7 +168,7 @@ class Play extends Phaser.Scene {
         });
 
         // TODO: Draw Player on top
-        this.player = new Player(this, game.config.width / 2, 3 * game.config.height / 4, 'player', 0, 10).setOrigin(0.5, 0.5);
+        this.player = new Player(this, game.config.width / 2, 3 * game.config.height / 4, 'player', 0, 10).setOrigin(0, 0);
 
         this.gameTime = 0;
     }
@@ -240,14 +240,14 @@ class Play extends Phaser.Scene {
         let bullet;
         if (this.bulletPool.getLength()) {
             bullet = this.bulletPool.getFirst();
-            bullet.x = this.player.x;
+            bullet.x = this.player.x + this.player.width / 2;
             bullet.y = this.player.y;
             bullet.active = true;
             bullet.visible = true;
             // TODO: vars
             this.bulletPool.remove(bullet);
         } else {
-            bullet = new Bullet(this, this.player.x, this.player.y, 'bullet', 0, 15);
+            bullet = new Bullet(this, this.player.x + this.player.width / 2, this.player.y, 'bullet', 0, 15);
             this.bulletGroup.add(bullet);
         }
     }
