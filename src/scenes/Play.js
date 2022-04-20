@@ -55,19 +55,76 @@ class Play extends Phaser.Scene {
     }
 
     create() {
-
+        this.enemyGroup = [];
+        this.enemyPool = [];
+        this.enemyConfigs = [];
+        const enemyRedConfig = {
+            // Texture settings
+            texture: 'enemy1',
+            startFrame: 0,
+            endFrame: 1,
+            // Behaviour
+            speed: 3,
+            shootInterval: 0, // This enemy doesn't shoot, so irrelevant number
+            // Functions
+            moveFunction: defaultMovement,
+            fireFunction: defaultFire,
+            deathFunction: defaultDeathCondition,
+        };
+        this.addEnemyPoolGroupPair(enemyRedConfig);
+        const enemyGreenConfig = {
+            // Texture settings
+            texture: 'enemy2',
+            startFrame: 0,
+            endFrame: 1,
+            // Behaviour
+            speed: 4,
+            shootInterval: 300,
+            moveFunction: defaultMovement,
+            fireFunction: (enemy) => { /* TODO */ },
+            deathFunction: defaultDeathCondition,
+        }
+        this.addEnemyPoolGroupPair(enemyGreenConfig);
+        const enemyBlueConfig = {
+            // Texture settings
+            texture: 'enemy3',
+            startFrame: 0,
+            endFrame: 1,
+            // Behaviour
+            speed: 1,
+            shootInterval: 300,
+            moveFunction: defaultMovement,
+            fireFunction: (enemy) => { /* TODO */ },
+            deathFunction: defaultDeathCondition,
+        }
+        this.addEnemyPoolGroupPair(enemyBlueConfig);
+        // TODO: get this to spawn at bottom
+        const enemyYellowConfig = {
+            // Texture settings
+            texture: 'enemy4',
+            startFrame: 0,
+            endFrame: 1,
+            // Behaviour
+            speed: -2,
+            shootInterval: 300,
+            moveFunction: defaultMovement,
+            fireFunction: defaultFire,
+            deathFunction: defaultDeathCondition,
+        }
+        this.addEnemyPoolGroupPair(enemyYellowConfig);
         // Object pooling based off:
         // https://www.emanueleferonato.com/2018/11/13/build-a-html5-endless-runner-with-phaser-in-a-few-lines-of-code-using-arcade-physics-and-featuring-object-pooling/
-        this.enemyGroup = this.add.group({
-            removeCallback: (enemy) => {
-                enemy.scene.enemyPool.add(enemy);
-            }
-        });
-        this.enemyPool = this.add.group({
-            removeCallback: (enemy) => {
-                enemy.scene.enemyGroup.add(enemy);
-            }
-        });
+        // this.enemyGroup = this.add.group({
+        //     removeCallback: (enemy) => {
+        //         enemy.scene.enemyPool.add(enemy);
+        //     }
+        // });
+        // this.enemyPool = this.add.group({
+        //     removeCallback: (enemy) => {
+        //         enemy.scene.enemyGroup.add(enemy);
+        //     }
+        // });
+        
 
         this.bulletGroup = this.add.group({
             removeCallback: (bullet) => {
@@ -85,10 +142,28 @@ class Play extends Phaser.Scene {
         // TODO: Set up timers to add enemies (different types)
         // TODO: pass in config
         // this.addEnemy(0, Math.random() * game.config.width);
-        this.enemyTimer = this.time.addEvent({
+        this.time.addEvent({
             delay: 500,
             callback: () => {
-                this.addEnemy(0, game.config.width / 2);
+                this.addEnemy(enemyRedConfig, Math.random() * game.config.width);
+            }, loop: true
+        });
+        this.time.addEvent({
+            delay: 1000,
+            callback: () => {
+                this.addEnemy(enemyGreenConfig, Math.random() * game.config.width);
+            }, loop: true
+        });
+        this.time.addEvent({
+            delay: 1500,
+            callback: () => {
+                this.addEnemy(enemyBlueConfig, Math.random() * game.config.width);
+            }, loop: true
+        });
+        this.time.addEvent({
+            delay: 2000,
+            callback: () => {
+                this.addEnemy(enemyYellowConfig, Math.random() * game.config.width);
             }, loop: true
         });
 
@@ -105,29 +180,32 @@ class Play extends Phaser.Scene {
 
         this.player.update();
 
-        this.enemyGroup.getChildren().forEach((enemy) => {
-            enemy.update();
-            if (enemy.checkCollision(this.player)) {
-                console.log("KACHOW!");
-                this.scene.start("menuScene");           // crashes game
-            };
-            if (enemy.deathFunction(enemy)) {
-                this.enemyGroup.killAndHide(enemy);
-                this.enemyGroup.remove(enemy);
-            }
-        }, this);
+        for (let i = 0; i < this.enemyGroup.length; i++) {
+            this.enemyGroup[i].getChildren().forEach((enemy) => {
+                enemy.update();
+                if (enemy.checkCollision(this.player)) {
+                    this.scene.start("menuScene");
+                };
+                if (enemy.deathFunction(enemy)) {
+                    this.enemyGroup[i].killAndHide(enemy);
+                    this.enemyGroup[i].remove(enemy);
+                }
+            }, this);
+        }
 
         this.bulletGroup.getChildren().forEach((bullet) => {
             bullet.update();
-            let enemy = bullet.checkCollision(this.enemyGroup);
+            let res = bullet.checkCollision(this.enemyGroup);
+            let enemy = res[0];
+            let index = res[1];
             if (enemy || bullet.y < 0) {
                 // TODO: more advanced kill condition
                 this.bulletGroup.killAndHide(bullet);
                 this.bulletGroup.remove(bullet);
             }
             if (enemy) {
-                this.enemyGroup.killAndHide(enemy);
-                this.enemyGroup.remove(enemy);
+                this.enemyGroup[index].killAndHide(enemy);
+                this.enemyGroup[index].remove(enemy);
             }
         }, this);
         // TODO: collisions
@@ -135,30 +213,24 @@ class Play extends Phaser.Scene {
 
     // Object pooling based off:
     // https://www.emanueleferonato.com/2018/11/13/build-a-html5-endless-runner-with-phaser-in-a-few-lines-of-code-using-arcade-physics-and-featuring-object-pooling/
-    addEnemy(enemyType, posX) {
+    addEnemy(enemyConfig, posX) {
         let enemy;
-        if (this.enemyPool.getLength()) {
-            enemy = this.enemyPool.getFirst();
+        let index = this.getEnemyConfigIndex(enemyConfig);
+        if (index == -1) {
+            return;
+        }
+        if (this.enemyPool[index].getLength()) {
+            enemy = this.enemyPool[index].getFirst();
             enemy.x = posX;
             enemy.y = 0;
             enemy.time = 0;
             enemy.active = true;
             enemy.visible = true;
-            this.enemyPool.remove(enemy);
+            this.enemyPool[index].remove(enemy);
         } else {
-            enemy = new Enemy(this, posX, 0, {
-                texture: 'enemy1',
-                startFrame: 0,
-                endFrame: 1,
-                speed: 3,
-                shootInterval: 0,
-                moveFunction: (enemy) => {
-                   enemy.y += enemy.speed;
-                   enemy.x += 150 * cos(3 * enemy.time) / game.config.fps;
-                } 
-            });
+            enemy = new Enemy(this, posX, 0, enemyConfig);
             // enemy.time = this.time;
-            this.enemyGroup.add(enemy);
+            this.enemyGroup[index].add(enemy);
         }
     }
 
@@ -179,5 +251,30 @@ class Play extends Phaser.Scene {
             this.bulletGroup.add(bullet);
         }
     }
-    
+
+    addEnemyPoolGroupPair(enemyconfig) {
+        let index = this.enemyGroup.length;
+        // Object pooling based off:
+        // https://www.emanueleferonato.com/2018/11/13/build-a-html5-endless-runner-with-phaser-in-a-few-lines-of-code-using-arcade-physics-and-featuring-object-pooling/
+        this.enemyGroup.push(this.add.group({
+            removeCallback: (enemy) => {
+                this.enemyPool[index].add(enemy);
+            }
+        }));
+        this.enemyPool.push(this.add.group({
+            removeCallback: (enemy) => {
+                this.enemyGroup[index].add(enemy);
+            }
+        }));
+        this.enemyConfigs.push(enemyconfig);
+    }
+
+    getEnemyConfigIndex(enemyconfig) {
+        for (let i = 0; i < this.enemyConfigs.length; i++) {
+            if (enemyconfig == this.enemyConfigs[i]) {
+                return i;
+            }
+        }
+        return -1;
+    }
 }

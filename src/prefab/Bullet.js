@@ -16,23 +16,24 @@ class Bullet extends Phaser.GameObjects.Sprite {
     }
 
     checkCollision(enemyGroup) {
-        let hit = null;
-        enemyGroup.getChildren().forEach((enemy) => {
-            // AABB checking
-            if (this.x < enemy.x + enemy.width && 
-                this.x + this.width > enemy.x && 
-                this.y < enemy.y + enemy.height && 
-                this.y + this.height > enemy.y) {
-                    console.log("pew");
-                    this.hit(enemy);
-                    hit = enemy;
-                }
-            
-                    //       return true;
-            //} else {
-            //    return false;
-           // }            
-        });
+        let hit = [null, -1];
+        for (let i = 0; i < enemyGroup.length; i++) {
+            enemyGroup[i].getChildren().forEach((enemy) => {
+                // AABB checking
+                if (this.x < enemy.x + enemy.width && 
+                    this.x + this.width > enemy.x && 
+                    this.y < enemy.y + enemy.height && 
+                    this.y + this.height > enemy.y) {
+                        this.hit(enemy);
+                        hit = [enemy, i];
+                    }
+                
+                        //       return true;
+                //} else {
+                //    return false;
+            // }            
+            });
+        }
         return hit;
     }
 
