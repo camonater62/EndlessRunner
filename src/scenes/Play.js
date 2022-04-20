@@ -29,10 +29,24 @@ class Play extends Phaser.Scene {
             startFrame: 0,
             endFrame: 1
         });
-        // this.load.image('enemy1', './assets/firstenemy-0.png');
-        this.load.image('enemy2', './assets/secondenemy-0.png');
-        this.load.image('enemy3', './assets/thirdenemy-0.png');
-        this.load.image('enemy4', './assets/fourthenemy-0.png');
+        this.load.spritesheet('enemy2', './assets/secondenemy.png', {
+            frameWidth: 50,
+            frameHeight: 32,
+            startFrame: 0,
+            endFrame: 1
+        });
+        this.load.spritesheet('enemy3', './assets/thirdenemy.png', {
+            frameWidth: 86,
+            frameHeight: 54,
+            startFrame: 0,
+            endFrame: 1
+        });
+        this.load.spritesheet('enemy4', './assets/fourthenemy.png', {
+            frameWidth: 50,
+            frameHeight: 42,
+            startFrame: 0,
+            endFrame: 1
+        });
 
         this.load.image('bullet', './assets/bullet.png');
 
@@ -42,6 +56,7 @@ class Play extends Phaser.Scene {
                 this.addEnemy(0, game.config.width / 2);
             }, loop: true
         });
+        this.load.image('ocean', './assets/ocean.png');
     }
 
     create() {
@@ -70,6 +85,8 @@ class Play extends Phaser.Scene {
             }
         });
 
+        this.ocean = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'ocean').setOrigin(0, 0);
+
         // TODO: Set up timers to add enemies (different types)
         // TODO: pass in config
         // this.addEnemy(0, Math.random() * game.config.width);
@@ -83,6 +100,8 @@ class Play extends Phaser.Scene {
 
     update() {
         this.gameTime += 1 / this.game.config.fps;
+
+        this.ocean.tilePositionY -= 1.5;
 
         this.player.update();
 
