@@ -54,4 +54,16 @@ class Enemy extends Phaser.GameObjects.Sprite {
 
         this.moveFunction(this);
     }
+
+    checkCollision(player) {
+        // AABB checking
+        if (this.x < player.x + player.width && 
+            this.x + this.width > player.x && 
+            this.y < player.y + player.height && 
+            this.y + this.height > player.y) {
+                return true;
+        } else {
+            return false;
+        }
+    }
 }

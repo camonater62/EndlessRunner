@@ -11,7 +11,7 @@ let config = {
     type: Phaser.AUTO,
     width: 720,
     height: 960,
-    scene: [Play],
+    scene: [Play, Menu],
     fps: 60,
 };
 

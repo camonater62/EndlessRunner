@@ -10,7 +10,8 @@ class Player extends Phaser.GameObjects.Sprite {
         this.anims.create({
             key: 'animation',
             frames: this.anims.generateFrameNames(texture, {start: 0, end: 1, first: 0}),
-            frameRate: 30
+            frameRate: 30,
+            repeat: -1,
         });
 
         /*

@@ -1,4 +1,7 @@
 class Play extends Phaser.Scene {
+    constructor() {
+        super("playScene");
+    }
 
     preload() {
         keyDOWN = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
@@ -32,6 +35,13 @@ class Play extends Phaser.Scene {
         this.load.image('enemy4', './assets/fourthenemy-0.png');
 
         this.load.image('bullet', './assets/bullet.png');
+
+        this.enemyTimer = this.time.addEvent({
+            delay: 500,
+            callback: () => {
+                this.addEnemy(0, game.config.width / 2);
+            }, loop: true
+        });
     }
 
     create() {
@@ -63,26 +73,25 @@ class Play extends Phaser.Scene {
         // TODO: Set up timers to add enemies (different types)
         // TODO: pass in config
         // this.addEnemy(0, Math.random() * game.config.width);
-        this.enemyTimer = this.time.addEvent({
-            delay: 500,
-            callback: () => {
-                this.addEnemy(0, game.config.width / 2);
-            }, loop: true
-        });
+
 
         // TODO: Draw Player on top
         this.player = new Player(this, game.config.width / 2, 3 * game.config.height / 4, 'player', 0, 10).setOrigin(0.5, 0.5);
 
-        this.time = 0;
+        this.gameTime = 0;
     }
 
     update() {
-        this.time += 1 / this.game.config.fps;
+        this.gameTime += 1 / this.game.config.fps;
 
         this.player.update();
 
         this.enemyGroup.getChildren().forEach((enemy) => {
             enemy.update();
+            if (enemy.checkCollision(this.player)) {
+                console.log("KACHOW!");
+                this.scene.start("menuScene");           // crashes game
+            };
             if (enemy.deathFunction(enemy)) {
                 this.enemyGroup.killAndHide(enemy);
                 this.enemyGroup.remove(enemy);
@@ -90,12 +99,13 @@ class Play extends Phaser.Scene {
         }, this);
 
         this.bulletGroup.getChildren().forEach((bullet) => {
-             bullet.update();
-             if (bullet.y < 0) {
-                 // TODO: more advanced kill condition
-                 this.bulletGroup.killAndHide(bullet);
-                 this.bulletGroup.remove(bullet);
-             }
+            bullet.update();
+            bullet.checkCollision(this.enemyGroup);
+            if (bullet.y < 0) {
+                // TODO: more advanced kill condition
+                this.bulletGroup.killAndHide(bullet);
+                this.bulletGroup.remove(bullet);
+            }
         }, this);
         // TODO: collisions
     }
