@@ -126,18 +126,19 @@ class Play extends Phaser.Scene {
         // });
         
 
-        this.bulletGroup = this.add.group({
+        this.bulletGroup = this.physics.add.group({
             removeCallback: (bullet) => {
                 bullet.scene.bulletPool.add(bullet);
             }
         });
-        this.bulletPool = this.add.group({
+        this.bulletPool = this.physics.add.group({
             removeCallback: (bullet) => {
                 bullet.scene.bulletGroup.add(bullet);
             }
         });
 
         this.ocean = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'ocean').setOrigin(0, 0);
+        this.ocean.alpha = 0.75;
 
         // TODO: Set up timers to add enemies (different types)
         // TODO: pass in config
@@ -171,6 +172,15 @@ class Play extends Phaser.Scene {
         this.player = new Player(this, game.config.width / 2, 3 * game.config.height / 4, 'player', 0, 10).setOrigin(0, 0);
 
         this.gameTime = 0;
+
+        for (let i = 0; i < this.enemyGroup.length; i++) {
+            this.physics.add.collider(this.bulletGroup, this.enemyGroup[i], (bullet, enemy) => {
+                this.bulletGroup.killAndHide(bullet);
+                this.bulletGroup.remove(bullet);
+                this.enemyGroup[i].killAndHide(enemy);
+                this.enemyGroup[i].remove(enemy);
+            })
+        }
     }
 
     update() {
@@ -183,32 +193,33 @@ class Play extends Phaser.Scene {
         for (let i = 0; i < this.enemyGroup.length; i++) {
             this.enemyGroup[i].getChildren().forEach((enemy) => {
                 enemy.update();
-                if (enemy.checkCollision(this.player)) {
-                    this.scene.start("menuScene");
-                };
-                if (enemy.deathFunction(enemy)) {
-                    this.enemyGroup[i].killAndHide(enemy);
-                    this.enemyGroup[i].remove(enemy);
-                }
+                // if (enemy.checkCollision(this.player)) {
+                //     this.scene.start("menuScene");
+                // };
+                // if (enemy.deathFunction(enemy)) {
+                //     this.enemyGroup[i].killAndHide(enemy);
+                //     this.enemyGroup[i].remove(enemy);
+                // }
             }, this);
         }
 
         this.bulletGroup.getChildren().forEach((bullet) => {
             bullet.update();
-            let res = bullet.checkCollision(this.enemyGroup);
-            let enemy = res[0];
-            let index = res[1];
-            if (enemy || bullet.y < 0) {
-                // TODO: more advanced kill condition
-                this.bulletGroup.killAndHide(bullet);
-                this.bulletGroup.remove(bullet);
-            }
-            if (enemy) {
-                this.enemyGroup[index].killAndHide(enemy);
-                this.enemyGroup[index].remove(enemy);
-            }
+            // let res = bullet.checkCollision(this.enemyGroup);
+            // let enemy = res[0];
+            // let index = res[1];
+            // if (enemy || bullet.y < 0) {
+            //     // TODO: more advanced kill condition
+            //     this.bulletGroup.killAndHide(bullet);
+            //     this.bulletGroup.remove(bullet);
+            // }
+            // if (enemy) {
+            //     this.enemyGroup[index].killAndHide(enemy);
+            //     this.enemyGroup[index].remove(enemy);
+            // }
         }, this);
         // TODO: collisions
+
     }
 
     // Object pooling based off:
@@ -256,12 +267,12 @@ class Play extends Phaser.Scene {
         let index = this.enemyGroup.length;
         // Object pooling based off:
         // https://www.emanueleferonato.com/2018/11/13/build-a-html5-endless-runner-with-phaser-in-a-few-lines-of-code-using-arcade-physics-and-featuring-object-pooling/
-        this.enemyGroup.push(this.add.group({
+        this.enemyGroup.push(this.physics.add.group({
             removeCallback: (enemy) => {
                 this.enemyPool[index].add(enemy);
             }
         }));
-        this.enemyPool.push(this.add.group({
+        this.enemyPool.push(this.physics.add.group({
             removeCallback: (enemy) => {
                 this.enemyGroup[index].add(enemy);
             }

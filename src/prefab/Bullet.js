@@ -1,4 +1,4 @@
-class Bullet extends Phaser.GameObjects.Sprite {
+class Bullet extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y, texture, frame, speed) {
         super(scene, x, y, texture, frame);
 
@@ -8,6 +8,7 @@ class Bullet extends Phaser.GameObjects.Sprite {
         this.scale = 0.25;
 
         scene.add.existing(this);
+        scene.physics.add.existing(this);
     }
 
     update() {

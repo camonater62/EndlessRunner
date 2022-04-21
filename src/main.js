@@ -12,7 +12,15 @@ let config = {
     width: 720,
     height: 960,
     scene: [Play, Menu],
-    fps: 60,
+    fps: 30,
+    physics: {
+        default: 'arcade',
+        arcade: {
+            useTree: true,
+            gravity: { y: 0 },
+            debug: true
+        },
+    }
 };
 
 let highScore = localStorage.getItem('highScore');

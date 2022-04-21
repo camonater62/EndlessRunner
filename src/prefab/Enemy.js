@@ -11,34 +11,7 @@ const defaultFire = (enemy) => {
     // do nothing
 }
 
-/*
-let enemy;
-        if (this.enemyPool.getLength()) {
-            enemy = this.enemyPool.getFirst();
-            enemy.x = posX;
-            enemy.y = 0;
-            enemy.time = 0;
-            enemy.active = true;
-            enemy.visible = true;
-            this.enemyPool.remove(enemy);
-        } else {
-            enemy = new Enemy(this, posX, 0, {
-                texture: 'enemy1',
-                startFrame: 0,
-                endFrame: 1,
-                speed: 3,
-                shootInterval: 0,
-                moveFunction: (enemy) => {
-                   enemy.y += enemy.speed;
-                   enemy.x += 150 * cos(3 * enemy.time) / game.config.fps;
-                } 
-            });
-            // enemy.time = this.time;
-            this.enemyGroup.add(enemy);
-        }
-*/
-
-class Enemy extends Phaser.GameObjects.Sprite {
+class Enemy extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y, 
         {
             texture, startFrame, endFrame, speed, shootInterval, 
@@ -59,6 +32,7 @@ class Enemy extends Phaser.GameObjects.Sprite {
         this.time = 0;
 
         scene.add.existing(this);
+        scene.physics.add.existing(this);
 
         this.anims.create({
             key: 'animation',
