@@ -91,7 +91,7 @@ class Play extends Phaser.Scene {
             startFrame: 0,
             endFrame: 1,
             // Behaviour
-            speed: 1,
+            speed: 10,
             shootInterval: 300,
             moveFunction: defaultMovement,
             fireFunction: (enemy) => { /* TODO */ },
