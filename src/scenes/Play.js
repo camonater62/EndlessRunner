@@ -83,7 +83,7 @@ class Play extends Phaser.Scene {
             startFrame: 0,
             endFrame: 1,
             // Behaviour
-            speed: 3,
+            speed: 150,
             shootInterval: 0, // This enemy doesn't shoot, so irrelevant number
             // Functions
             moveFunction: defaultMovement,
@@ -97,7 +97,7 @@ class Play extends Phaser.Scene {
             startFrame: 0,
             endFrame: 1,
             // Behaviour
-            speed: 4,
+            speed: 100,
             shootInterval: 300,
             moveFunction: defaultMovement,
             fireFunction: (enemy) => { /* TODO */ },
@@ -110,7 +110,7 @@ class Play extends Phaser.Scene {
             startFrame: 0,
             endFrame: 1,
             // Behaviour
-            speed: 10,
+            speed: 200,
             shootInterval: 300,
             moveFunction: defaultMovement,
             fireFunction: (enemy) => { /* TODO */ },
@@ -183,7 +183,7 @@ class Play extends Phaser.Scene {
     update() {
         this.gameTime += 1 / this.game.config.fps;
 
-        this.ocean.tilePositionY = -100 * this.gameTime;
+        this.ocean.tilePositionY = -75 * this.gameTime;
 
         this.player.update();
 

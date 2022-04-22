@@ -4,7 +4,8 @@ const defaultDeathCondition = (enemy) => {
 };
 
 const defaultMovement = (enemy) => {
-    enemy.y += enemy.speed;
+    // enemy.y += enemy.speed;
+    enemy.setVelocityY(enemy.speed);
 }
 
 const defaultFire = (enemy) => {
