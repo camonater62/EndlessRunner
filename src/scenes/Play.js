@@ -84,7 +84,7 @@ class Play extends Phaser.Scene {
             endFrame: 1,
             // Behaviour
             speed: 150,
-            shootInterval: 0, // This enemy doesn't shoot, so irrelevant number
+            shootInterval: 1000000, // This enemy doesn't shoot, so irrelevant number
             // Functions
             moveFunction: defaultMovement,
             fireFunction: defaultFire,
@@ -100,7 +100,10 @@ class Play extends Phaser.Scene {
             speed: 100,
             shootInterval: 300,
             moveFunction: defaultMovement,
-            fireFunction: (enemy) => { /* TODO */ },
+            fireFunction: (enemy) => { 
+                // TODO: config
+                this.addBullet(enemy.x, enemy.y, null);
+            },
             deathFunction: defaultDeathCondition,
         }
         this.addEnemyPoolGroupPair(enemyGreenConfig);
@@ -131,27 +134,7 @@ class Play extends Phaser.Scene {
             deathFunction: defaultDeathCondition,
         }
         this.addEnemyPoolGroupPair(enemyYellowConfig);
-        // Object pooling based off:
-        // https://www.emanueleferonato.com/2018/11/13/build-a-html5-endless-runner-with-phaser-in-a-few-lines-of-code-using-arcade-physics-and-featuring-object-pooling/
-        // this.enemyGroup = this.add.group({
-        //     removeCallback: (enemy) => {
-        //         enemy.scene.enemyPool.add(enemy);
-        //     }
-        // });
-        // this.enemyPool = this.add.group({
-        //     removeCallback: (enemy) => {
-        //         enemy.scene.enemyGroup.add(enemy);
-        //     }
-        // });
         
-
-        
-
-        
-
-        // TODO: Set up timers to add enemies (different types)
-        // TODO: pass in config
-        // this.addEnemy(0, Math.random() * game.config.width);
         this.time.addEvent({
             delay: 500,
             callback: () => {
@@ -200,6 +183,11 @@ class Play extends Phaser.Scene {
         this.bulletGroup.getChildren().forEach((bullet) => {
             // TODO: advanced movement
             bullet.update();
+            // TODO: better death condition
+            if (bullet.y < 0 || bullet.y > this.game.config.height) {
+                this.bulletGroup.killAndHide(bullet);
+                this.bulletGroup.remove(bullet);
+            }
         }, this);
 
     }
@@ -219,6 +207,7 @@ class Play extends Phaser.Scene {
             enemy.time = 0;
             enemy.active = true;
             enemy.visible = true;
+            enemy.shootTimer.paused = false;
             this.enemyPool[index].remove(enemy);
         } else {
             enemy = new Enemy(this, posX, 0, enemyConfig);
@@ -227,19 +216,20 @@ class Play extends Phaser.Scene {
         }
     }
 
-    // TODO: args
-    addBullet() {
+    // TODO: config
+    addBullet(x, y, config) {
         let bullet;
         if (this.bulletPool.getLength()) {
             bullet = this.bulletPool.getFirst();
-            bullet.x = this.player.x + this.player.width / 2;
-            bullet.y = this.player.y;
+            bullet.x = x; //this.player.x + this.player.width / 2;
+            bullet.y = y; //this.player.y;
             bullet.active = true;
             bullet.visible = true;
-            // TODO: vars
+            // TODO: config
             this.bulletPool.remove(bullet);
         } else {
-            bullet = new Bullet(this, this.player.x + this.player.width / 2, this.player.y, 'bullet', 0, 15);
+            // TODO: config
+            bullet = new Bullet(this, x, y, 'bullet', 0, 15);
             this.bulletGroup.add(bullet);
         }
     }
@@ -251,6 +241,7 @@ class Play extends Phaser.Scene {
         this.enemyGroup.push(this.physics.add.group({
             removeCallback: (enemy) => {
                 this.enemyPool[index].add(enemy);
+                enemy.shootTimer.paused = true;
             }
         }));
         this.enemyPool.push(this.physics.add.group({

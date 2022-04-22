@@ -43,6 +43,12 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
             }),
             frameRate: 20
         });
+
+        this.shootTimer = scene.time.addEvent({
+            delay: shootInterval,
+            callback: () => {fireFunction(this);},
+            loop: true,
+        });
     }
 
     update() {
