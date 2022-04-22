@@ -1,10 +1,11 @@
-class Player extends Phaser.GameObjects.Sprite {
+class Player extends Phaser.Physics.Arcade.Sprite {
 
     // TODO: config table
     constructor(scene, x, y, texture, frame, speed) {
         super(scene, x, y, texture, frame);
 
         scene.add.existing(this);
+        scene.physics.add.existing(this);
 
         this.texture.setFilter('NEAREST');
         //this.scale = 0.6; // Would like to avoid this
@@ -28,6 +29,8 @@ class Player extends Phaser.GameObjects.Sprite {
             paused: true,
             startAt: 250
         });
+        
+
     }
 
     update() {
@@ -35,17 +38,23 @@ class Player extends Phaser.GameObjects.Sprite {
             this.anims.play('animation');
         }
 
+        // TODO: Make movement based of physics velocity 
+        // so that movement speed isn't tied to FPS
         if (keyLEFT.isDown || keyA.isDown) {
             this.x -= this.speed;
+        //    this.setVelocityX(-this.speed);
         }
         if (keyRIGHT.isDown || keyD.isDown) {
             this.x += this.speed;
+        //    this.setVelocityX(this.speed);
         }
         if (keyUP.isDown || keyW.isDown) {
             this.y -= this.speed;
+        //    this.setVelocityY(-this.speed);
         }
         if (keyDOWN.isDown || keyS.isDown) {
             this.y += this.speed;
+        //    this.setVelocityY(this.speed);
         }
 
         if (keySpace.isDown) {
