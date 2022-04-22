@@ -1,5 +1,4 @@
 const defaultDeathCondition = (enemy) => {
-    // TODO: Handle getting shot
     return enemy.y > game.config.height;
 };
 
@@ -11,6 +10,9 @@ const defaultMovement = (enemy) => {
 const defaultFire = (enemy) => {
     // do nothing
 }
+
+// TODO: save animations
+let animations;
 
 class Enemy extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y, 
@@ -52,8 +54,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
     }
 
     update() {
-        // TODO: Check collision
-
+        // TODO: make time accurate (untie fps)
         this.time += 1 / game.config.fps;
 
         if (!this.anims.isPlaying) {
@@ -61,17 +62,5 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
         }
 
         this.moveFunction(this);
-    }
-
-    checkCollision(player) {
-        // AABB checking
-        if (this.x < player.x + player.width && 
-            this.x + this.width > player.x && 
-            this.y < player.y + player.height && 
-            this.y + this.height > player.y) {
-                return true;
-        } else {
-            return false;
-        }
     }
 }

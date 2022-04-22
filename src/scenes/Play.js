@@ -102,7 +102,7 @@ class Play extends Phaser.Scene {
             moveFunction: defaultMovement,
             fireFunction: (enemy) => { 
                 // TODO: config
-                this.addBullet(enemy.x, enemy.y, null);
+                this.addBullet(enemy.x, enemy.y + enemy.height, null);
             },
             deathFunction: defaultDeathCondition,
         }
@@ -120,14 +120,14 @@ class Play extends Phaser.Scene {
             deathFunction: defaultDeathCondition,
         }
         this.addEnemyPoolGroupPair(enemyBlueConfig);
-        // TODO: get this to spawn at bottom
         const enemyYellowConfig = {
             // Texture settings
             texture: 'enemy4',
+            y: this.game.config.height,
             startFrame: 0,
             endFrame: 1,
             // Behaviour
-            speed: -2,
+            speed: -200,
             shootInterval: 300,
             moveFunction: defaultMovement,
             fireFunction: defaultFire,
@@ -192,29 +192,7 @@ class Play extends Phaser.Scene {
 
     }
 
-    // Object pooling based off:
-    // https://www.emanueleferonato.com/2018/11/13/build-a-html5-endless-runner-with-phaser-in-a-few-lines-of-code-using-arcade-physics-and-featuring-object-pooling/
-    addEnemy(enemyConfig, posX) {
-        let enemy;
-        let index = this.getEnemyConfigIndex(enemyConfig);
-        if (index == -1) {
-            return;
-        }
-        if (this.enemyPool[index].getLength()) {
-            enemy = this.enemyPool[index].getFirst();
-            enemy.x = posX;
-            enemy.y = 0;
-            enemy.time = 0;
-            enemy.active = true;
-            enemy.visible = true;
-            enemy.shootTimer.paused = false;
-            this.enemyPool[index].remove(enemy);
-        } else {
-            enemy = new Enemy(this, posX, 0, enemyConfig);
-            // enemy.time = this.time;
-            this.enemyGroup[index].add(enemy);
-        }
-    }
+    
 
     // TODO: config
     addBullet(x, y, config) {
@@ -231,6 +209,34 @@ class Play extends Phaser.Scene {
             // TODO: config
             bullet = new Bullet(this, x, y, 'bullet', 0, 15);
             this.bulletGroup.add(bullet);
+        }
+    }
+
+    // Object pooling based off:
+    // https://www.emanueleferonato.com/2018/11/13/build-a-html5-endless-runner-with-phaser-in-a-few-lines-of-code-using-arcade-physics-and-featuring-object-pooling/
+    addEnemy(enemyConfig, posX) {
+        let enemy;
+        let index = this.getEnemyConfigIndex(enemyConfig);
+        if (index == -1) {
+            return;
+        }
+        if (this.enemyPool[index].getLength()) {
+            enemy = this.enemyPool[index].getFirst();
+            enemy.x = posX;
+            enemy.y = 0;
+           
+            enemy.time = 0;
+            enemy.active = true;
+            enemy.visible = true;
+            enemy.shootTimer.paused = false;
+            this.enemyPool[index].remove(enemy);
+        } else {
+            enemy = new Enemy(this, posX, 0, enemyConfig);
+            // enemy.time = this.time;
+            this.enemyGroup[index].add(enemy);
+        }
+        if (enemyConfig.y) {
+            enemy.y = enemyConfig.y;
         }
     }
 
