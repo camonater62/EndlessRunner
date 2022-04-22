@@ -55,6 +55,25 @@ class Play extends Phaser.Scene {
     }
 
     create() {
+
+        this.ocean = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'ocean').setOrigin(0, 0);
+        this.ocean.alpha = 0.75;
+
+        // TODO: Draw Player on top
+        this.player = new Player(this, game.config.width / 2, 3 * game.config.height / 4, 'player', 0, 750).setOrigin(0, 0);
+
+
+        this.bulletGroup = this.physics.add.group({
+            removeCallback: (bullet) => {
+                bullet.scene.bulletPool.add(bullet);
+            }
+        });
+        this.bulletPool = this.physics.add.group({
+            removeCallback: (bullet) => {
+                bullet.scene.bulletGroup.add(bullet);
+            }
+        });
+
         this.enemyGroup = [];
         this.enemyPool = [];
         this.enemyConfigs = [];
@@ -126,19 +145,9 @@ class Play extends Phaser.Scene {
         // });
         
 
-        this.bulletGroup = this.physics.add.group({
-            removeCallback: (bullet) => {
-                bullet.scene.bulletPool.add(bullet);
-            }
-        });
-        this.bulletPool = this.physics.add.group({
-            removeCallback: (bullet) => {
-                bullet.scene.bulletGroup.add(bullet);
-            }
-        });
+        
 
-        this.ocean = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'ocean').setOrigin(0, 0);
-        this.ocean.alpha = 0.75;
+        
 
         // TODO: Set up timers to add enemies (different types)
         // TODO: pass in config
@@ -168,57 +177,30 @@ class Play extends Phaser.Scene {
             }, loop: true
         });
 
-        // TODO: Draw Player on top
-        this.player = new Player(this, game.config.width / 2, 3 * game.config.height / 4, 'player', 0, 10).setOrigin(0, 0);
-
         this.gameTime = 0;
-
-        for (let i = 0; i < this.enemyGroup.length; i++) {
-            this.physics.add.collider(this.bulletGroup, this.enemyGroup[i], (bullet, enemy) => {
-                this.bulletGroup.killAndHide(bullet);
-                this.bulletGroup.remove(bullet);
-                this.enemyGroup[i].killAndHide(enemy);
-                this.enemyGroup[i].remove(enemy);
-            })
-        }
     }
 
     update() {
         this.gameTime += 1 / this.game.config.fps;
 
-        this.ocean.tilePositionY -= 1.5;
+        this.ocean.tilePositionY = -100 * this.gameTime;
 
         this.player.update();
 
         for (let i = 0; i < this.enemyGroup.length; i++) {
             this.enemyGroup[i].getChildren().forEach((enemy) => {
                 enemy.update();
-                // if (enemy.checkCollision(this.player)) {
-                //     this.scene.start("menuScene");
-                // };
-                // if (enemy.deathFunction(enemy)) {
-                //     this.enemyGroup[i].killAndHide(enemy);
-                //     this.enemyGroup[i].remove(enemy);
-                // }
+                if (enemy.deathFunction(enemy)) {
+                    this.enemyGroup[i].killAndHide(enemy);
+                    this.enemyGroup[i].remove(enemy);
+                }
             }, this);
         }
 
         this.bulletGroup.getChildren().forEach((bullet) => {
+            // TODO: advanced movement
             bullet.update();
-            // let res = bullet.checkCollision(this.enemyGroup);
-            // let enemy = res[0];
-            // let index = res[1];
-            // if (enemy || bullet.y < 0) {
-            //     // TODO: more advanced kill condition
-            //     this.bulletGroup.killAndHide(bullet);
-            //     this.bulletGroup.remove(bullet);
-            // }
-            // if (enemy) {
-            //     this.enemyGroup[index].killAndHide(enemy);
-            //     this.enemyGroup[index].remove(enemy);
-            // }
         }, this);
-        // TODO: collisions
 
     }
 
@@ -247,7 +229,6 @@ class Play extends Phaser.Scene {
 
     // TODO: args
     addBullet() {
-        
         let bullet;
         if (this.bulletPool.getLength()) {
             bullet = this.bulletPool.getFirst();
@@ -278,6 +259,19 @@ class Play extends Phaser.Scene {
             }
         }));
         this.enemyConfigs.push(enemyconfig);
+        
+
+        this.physics.add.collider(this.bulletGroup, this.enemyGroup[index], (bullet, enemy) => {
+            this.bulletGroup.killAndHide(bullet);
+            this.bulletGroup.remove(bullet);
+            this.enemyGroup[index].killAndHide(enemy);
+            this.enemyGroup[index].remove(enemy);
+        });
+        this.physics.add.collider(this.player, this.enemyGroup[index], (player, enemy) => {
+            // TODO: Handle player damage
+            this.enemyGroup[index].killAndHide(enemy);
+            this.enemyGroup[index].remove(enemy);
+        });
     }
 
     getEnemyConfigIndex(enemyconfig) {

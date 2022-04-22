@@ -12,7 +12,7 @@ let config = {
     width: 720,
     height: 960,
     scene: [Play, Menu],
-    fps: 30,
+    fps: 60,
     physics: {
         default: 'arcade',
         arcade: {

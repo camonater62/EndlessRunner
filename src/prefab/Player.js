@@ -41,20 +41,23 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         // TODO: Make movement based of physics velocity 
         // so that movement speed isn't tied to FPS
         if (keyLEFT.isDown || keyA.isDown) {
-            this.x -= this.speed;
-        //    this.setVelocityX(-this.speed);
+        //    this.x -= this.speed;
+            this.setVelocityX(-this.speed);
+        } else if (keyRIGHT.isDown || keyD.isDown) {
+        //    this.x += this.speed;
+            this.setVelocityX(this.speed);
+        } else {
+            this.setVelocityX(0);
         }
-        if (keyRIGHT.isDown || keyD.isDown) {
-            this.x += this.speed;
-        //    this.setVelocityX(this.speed);
-        }
+
         if (keyUP.isDown || keyW.isDown) {
-            this.y -= this.speed;
-        //    this.setVelocityY(-this.speed);
-        }
-        if (keyDOWN.isDown || keyS.isDown) {
-            this.y += this.speed;
-        //    this.setVelocityY(this.speed);
+        //    this.y -= this.speed;
+            this.setVelocityY(-this.speed);
+        } else if (keyDOWN.isDown || keyS.isDown) {
+        //    this.y += this.speed;
+            this.setVelocityY(this.speed);
+        } else {
+            this.setVelocityY(0);
         }
 
         if (keySpace.isDown) {
