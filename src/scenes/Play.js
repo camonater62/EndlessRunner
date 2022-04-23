@@ -173,7 +173,8 @@ class Play extends Phaser.Scene {
         for (let i = 0; i < this.enemyGroup.length; i++) {
             this.enemyGroup[i].getChildren().forEach((enemy) => {
                 enemy.update();
-                if (enemy.deathFunction(enemy)) {
+                // TODO: Consider enemy death
+                if (enemy.remove || enemy.deathFunction(enemy)) {
                     this.enemyGroup[i].killAndHide(enemy);
                     this.enemyGroup[i].remove(enemy);
                 }
@@ -184,12 +185,11 @@ class Play extends Phaser.Scene {
             // // TODO: advanced movement
             bullet.update();
             // // TODO: better death condition
-            if (bullet.y < 0 || bullet.y > this.game.config.height) {
+            if (bullet.remove || bullet.y < 0 || bullet.y > this.game.config.height) {
                 this.bulletGroup.killAndHide(bullet);
                 this.bulletGroup.remove(bullet);
             }
         }, this);
-        // console.log(this.bulletGroup.getLength() + this.bulletPool.getLength());
     }
 
     
@@ -204,6 +204,8 @@ class Play extends Phaser.Scene {
             bullet.speed = speed;
             bullet.active = true;
             bullet.visible = true;
+
+            bullet.remove = false;
             // TODO: config
             this.bulletPool.remove(bullet);
         } else {
@@ -230,6 +232,9 @@ class Play extends Phaser.Scene {
             enemy.active = true;
             enemy.visible = true;
             enemy.shootTimer.paused = false;
+
+            enemy.remove = false;
+
             this.enemyPool[index].remove(enemy);
         } else {
             enemy = new Enemy(this, posX, 0, enemyConfig);
@@ -257,18 +262,13 @@ class Play extends Phaser.Scene {
             }
         }));
         this.enemyConfigs.push(enemyconfig);
-        
-
-        this.physics.add.collider(this.bulletGroup, this.enemyGroup[index], (bullet, enemy) => {
-            this.bulletGroup.killAndHide(bullet);
-            this.bulletGroup.remove(bullet);
-            this.enemyGroup[index].killAndHide(enemy);
-            this.enemyGroup[index].remove(enemy);
+    
+        this.physics.add.overlap(this.bulletGroup, this.enemyGroup[index], (bullet, enemy) => {
+            bullet.remove = true;
+            enemy.remove = true;
         });
-        this.physics.add.collider(this.player, this.enemyGroup[index], (player, enemy) => {
-            // TODO: Handle player damage
-            this.enemyGroup[index].killAndHide(enemy);
-            this.enemyGroup[index].remove(enemy);
+        this.physics.add.overlap(this.player, this.enemyGroup[index], (player, enemy) => {
+            enemy.remove = true;
         });
     }
 
