@@ -98,11 +98,11 @@ class Play extends Phaser.Scene {
             endFrame: 1,
             // Behaviour
             speed: 100,
-            shootInterval: 300,
+            shootInterval: 1000,
             moveFunction: defaultMovement,
             fireFunction: (enemy) => { 
                 // TODO: config
-                this.addBullet(enemy.x, enemy.y + enemy.height, null);
+                this.addBullet(enemy.x, enemy.y + enemy.height + 8, 200);
             },
             deathFunction: defaultDeathCondition,
         }
@@ -114,7 +114,7 @@ class Play extends Phaser.Scene {
             endFrame: 1,
             // Behaviour
             speed: 200,
-            shootInterval: 300,
+            shootInterval: 1000000,
             moveFunction: defaultMovement,
             fireFunction: (enemy) => { /* TODO */ },
             deathFunction: defaultDeathCondition,
@@ -128,7 +128,7 @@ class Play extends Phaser.Scene {
             endFrame: 1,
             // Behaviour
             speed: -200,
-            shootInterval: 300,
+            shootInterval: 1000000,
             moveFunction: defaultMovement,
             fireFunction: defaultFire,
             deathFunction: defaultDeathCondition,
@@ -181,33 +181,34 @@ class Play extends Phaser.Scene {
         }
 
         this.bulletGroup.getChildren().forEach((bullet) => {
-            // TODO: advanced movement
+            // // TODO: advanced movement
             bullet.update();
-            // TODO: better death condition
+            // // TODO: better death condition
             if (bullet.y < 0 || bullet.y > this.game.config.height) {
                 this.bulletGroup.killAndHide(bullet);
                 this.bulletGroup.remove(bullet);
             }
         }, this);
-
+        // console.log(this.bulletGroup.getLength() + this.bulletPool.getLength());
     }
 
     
 
     // TODO: config
-    addBullet(x, y, config) {
+    addBullet(x, y, speed) {
         let bullet;
         if (this.bulletPool.getLength()) {
             bullet = this.bulletPool.getFirst();
             bullet.x = x; //this.player.x + this.player.width / 2;
             bullet.y = y; //this.player.y;
+            bullet.speed = speed;
             bullet.active = true;
             bullet.visible = true;
             // TODO: config
             this.bulletPool.remove(bullet);
         } else {
             // TODO: config
-            bullet = new Bullet(this, x, y, 'bullet', 0, 15);
+            bullet = new Bullet(this, x, y, 'bullet', 0, speed);
             this.bulletGroup.add(bullet);
         }
     }

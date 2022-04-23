@@ -23,7 +23,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.shootTimer = scene.time.addEvent({
             delay: 150,
             callback: () => {
-                scene.addBullet(this.x + this.width / 2, this.y, null);
+                scene.addBullet(this.x + this.width / 2, this.y, -200);
             },
             loop: true,
             paused: true,
