@@ -47,6 +47,12 @@ class Play extends Phaser.Scene {
             startFrame: 0,
             endFrame: 1
         });
+        this.load.spritesheet('explosion-sheet', './assets/explosion.png', {
+            frameWidth: 32,
+            frameHeight: 32,
+            startFrame: 0,
+            endFrame: 9
+        });
 
         this.load.image('bullet', './assets/bullet.png');
 
@@ -64,6 +70,11 @@ class Play extends Phaser.Scene {
         // TODO: Draw Player on top
         this.player = new Player(this, game.config.width / 2, 3 * game.config.height / 4, 'player', 0, 750).setOrigin(0, 0);
 
+        this.anims.create({
+            key: 'explosion',
+            frames: this.anims.generateFrameNames('explosion-sheet', {start: 0, end: 9}),
+            frameRate: 30
+        });
 
         this.bulletGroup = this.physics.add.group({
             removeCallback: (bullet) => {
@@ -275,13 +286,28 @@ class Play extends Phaser.Scene {
         }));
         this.enemyConfigs.push(enemyconfig);
     
+        // TODO: Pool explosions?
         this.physics.add.overlap(this.bulletGroup, this.enemyGroup[index], (bullet, enemy) => {
             bullet.remove = true;
             enemy.remove = true;
+            let boom = this.add.sprite(enemy.x, enemy.y, 'health').setOrigin(0.5,0.5);
+            boom.scale = 2;
+            boom.anims.play('explosion');
+            boom.on('animationComplete', () => {
+                boom.alpha = 0;
+                boom.destroy();
+            });
         });
         this.physics.add.overlap(this.player, this.enemyGroup[index], (player, enemy) => {
             enemy.remove = true;
             this.player.health -= 5;
+            let boom = this.add.sprite(enemy.x, enemy.y, 'health').setOrigin(0.5,0.5);
+            boom.scale = 2;
+            boom.anims.play('explosion');
+            boom.on('animationComplete', () => {
+                boom.alpha = 0;
+                boom.destroy();
+            });
         });
     }
 
