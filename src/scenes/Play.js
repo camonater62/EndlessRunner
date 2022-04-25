@@ -52,6 +52,8 @@ class Play extends Phaser.Scene {
 
         
         this.load.image('ocean', './assets/ocean.png');
+
+        this.load.image('health', './assets/health.png');
     }
 
     create() {
@@ -72,6 +74,11 @@ class Play extends Phaser.Scene {
             removeCallback: (bullet) => {
                 bullet.scene.bulletGroup.add(bullet);
             }
+        });
+
+        this.physics.add.overlap(this.player, this.bulletGroup, (player, bullet) => {
+            bullet.remove = true;
+            player.health -= 2;
         });
 
         this.enemyGroup = [];
@@ -102,7 +109,7 @@ class Play extends Phaser.Scene {
             moveFunction: defaultMovement,
             fireFunction: (enemy) => { 
                 // TODO: config
-                this.addBullet(enemy.x, enemy.y + enemy.height + 8, 200);
+                this.addBullet(enemy.x, enemy.y + enemy.height + 8, 400);
             },
             deathFunction: defaultDeathCondition,
         }
@@ -136,29 +143,31 @@ class Play extends Phaser.Scene {
         this.addEnemyPoolGroupPair(enemyYellowConfig);
         
         this.time.addEvent({
-            delay: 500,
+            delay: 1113,
             callback: () => {
                 this.addEnemy(enemyRedConfig, Math.random() * game.config.width);
             }, loop: true
         });
         this.time.addEvent({
-            delay: 1000,
+            delay: 3337,
             callback: () => {
                 this.addEnemy(enemyGreenConfig, Math.random() * game.config.width);
             }, loop: true
         });
         this.time.addEvent({
-            delay: 1500,
+            delay: 7115,
             callback: () => {
                 this.addEnemy(enemyBlueConfig, Math.random() * game.config.width);
             }, loop: true
         });
         this.time.addEvent({
-            delay: 2000,
+            delay: 10000,
             callback: () => {
                 this.addEnemy(enemyYellowConfig, Math.random() * game.config.width);
             }, loop: true
         });
+
+        this.healthbar = this.add.tileSprite(30, 30, game.config.width - 60, 30, 'health', 0).setOrigin(0,0);
 
         this.gameTime = 0;
     }
@@ -190,6 +199,9 @@ class Play extends Phaser.Scene {
                 this.bulletGroup.remove(bullet);
             }
         }, this);
+
+        this.healthbar.width = (this.game.config.width - 60) * (this.player.health / this.player.max_health);
+        this.children.bringToTop(this.healthbar);
     }
 
     
@@ -269,6 +281,7 @@ class Play extends Phaser.Scene {
         });
         this.physics.add.overlap(this.player, this.enemyGroup[index], (player, enemy) => {
             enemy.remove = true;
+            this.player.health -= 5;
         });
     }
 

@@ -6,6 +6,8 @@ const max = Math.max;
 const min = Math.min;
 const sin = Math.sin;
 const cos = Math.cos;
+const sqrt = Math.sqrt;
+const abs = Math.abs;
 
 let config = {
     type: Phaser.AUTO,
