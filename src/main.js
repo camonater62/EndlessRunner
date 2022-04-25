@@ -9,6 +9,8 @@ const cos = Math.cos;
 const sqrt = Math.sqrt;
 const abs = Math.abs;
 
+const SQRT2 = sqrt(2);
+
 let config = {
     type: Phaser.AUTO,
     width: 720,
@@ -18,9 +20,9 @@ let config = {
     physics: {
         default: 'arcade',
         arcade: {
-            useTree: false,
+            useTree: true,
             gravity: { y: 0 },
-            debug: true
+            debug: false
         },
     }
 };

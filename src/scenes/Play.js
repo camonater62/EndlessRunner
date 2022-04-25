@@ -55,7 +55,6 @@ class Play extends Phaser.Scene {
         });
 
         this.load.image('bullet', './assets/bullet.png');
-
         
         this.load.image('ocean', './assets/ocean.png');
 
@@ -101,7 +100,7 @@ class Play extends Phaser.Scene {
             startFrame: 0,
             endFrame: 1,
             // Behaviour
-            speed: 150,
+            speed: 200,
             shootInterval: 1000000, // This enemy doesn't shoot, so irrelevant number
             // Functions
             moveFunction: defaultMovement,
@@ -115,7 +114,7 @@ class Play extends Phaser.Scene {
             startFrame: 0,
             endFrame: 1,
             // Behaviour
-            speed: 100,
+            speed: 150,
             shootInterval: 1000,
             moveFunction: defaultMovement,
             fireFunction: (enemy) => { 
@@ -131,10 +130,13 @@ class Play extends Phaser.Scene {
             startFrame: 0,
             endFrame: 1,
             // Behaviour
-            speed: 200,
-            shootInterval: 1000000,
+            speed: 300,
+            shootInterval: 500,
             moveFunction: defaultMovement,
-            fireFunction: (enemy) => { /* TODO */ },
+            fireFunction: (enemy) => { 
+                this.addBullet(1 * enemy.width / 3 + enemy.x, enemy.y + enemy.height + 8, 600);
+                this.addBullet(-1 * enemy.width / 3 + enemy.x, enemy.y + enemy.height + 8, 600);
+            },
             deathFunction: defaultDeathCondition,
         }
         this.addEnemyPoolGroupPair(enemyBlueConfig);
