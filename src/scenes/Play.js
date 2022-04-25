@@ -103,7 +103,12 @@ class Play extends Phaser.Scene {
             speed: 200,
             shootInterval: 1000000, // This enemy doesn't shoot, so irrelevant number
             // Functions
-            moveFunction: defaultMovement,
+            moveFunction: (enemy) => {
+            //    enemy.y += enemy.speed;
+            //    enemy.x += cos(enemy.time);
+                enemy.setVelocityY(enemy.speed);
+                enemy.setVelocityX(enemy.speed * sin(enemy.time) * 0.5);
+            },
             fireFunction: defaultFire,
             deathFunction: defaultDeathCondition,
         };
@@ -132,7 +137,10 @@ class Play extends Phaser.Scene {
             // Behaviour
             speed: 300,
             shootInterval: 500,
-            moveFunction: defaultMovement,
+            moveFunction: (enemy) => {
+                enemy.setVelocityY(enemy.speed);
+                enemy.setVelocityX(enemy.speed * sin(5 * enemy.time))
+            },
             fireFunction: (enemy) => { 
                 this.addBullet(1 * enemy.width / 3 + enemy.x, enemy.y + enemy.height + 8, 600);
                 this.addBullet(-1 * enemy.width / 3 + enemy.x, enemy.y + enemy.height + 8, 600);
@@ -147,9 +155,11 @@ class Play extends Phaser.Scene {
             startFrame: 0,
             endFrame: 1,
             // Behaviour
-            speed: -200,
-            shootInterval: 1000000,
-            moveFunction: defaultMovement,
+            speed: -750,
+            shootInterval: 1000000, // doesn't shoot
+            moveFunction: (enemy) => {
+                enemy.setAccelerationY(enemy.speed);
+            },
             fireFunction: defaultFire,
             deathFunction: defaultDeathCondition,
         }
@@ -158,7 +168,9 @@ class Play extends Phaser.Scene {
         this.time.addEvent({
             delay: 867,
             callback: () => {
-                this.addEnemy(enemyRedConfig, Math.random() * game.config.width);
+                // TODO: remove special stuff ; make universal
+                let e = this.addEnemy(enemyRedConfig, 0.25 * game.config.width * sin(5 * this.gameTime) + this.game.config.width / 2);
+                e.time = Math.random() * this.gameTime;
             }, 
             loop: true,
             startAt: 0
@@ -277,6 +289,8 @@ class Play extends Phaser.Scene {
         if (enemyConfig.y) {
             enemy.y = enemyConfig.y;
         }
+
+        return enemy;
     }
 
     addEnemyPoolGroupPair(enemyconfig) {
