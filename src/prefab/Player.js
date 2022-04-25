@@ -32,7 +32,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
             startAt: 250
         });
         
-        this.setCollideWorldBounds(true, game.config.width, game.config.height, 0);
+        // this.setCollideWorldBounds(true, game.config.width, game.config.height, 0);
     }
 
     update() {
@@ -77,7 +77,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         }
 
 
-        // this.y = max(min(game.config.height - this.height / 2, this.y), -this.height / 2);
-        // this.x = max(min(game.config.width - this.width / 2, this.x), -this.width / 2);
+        this.y = max(min(game.config.height - this.height / 2, this.y), -this.height / 2);
+        this.x = max(min(game.config.width - this.width / 2, this.x), -this.width / 2);
     }
 }

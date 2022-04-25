@@ -156,28 +156,36 @@ class Play extends Phaser.Scene {
         this.addEnemyPoolGroupPair(enemyYellowConfig);
         
         this.time.addEvent({
-            delay: 1113,
+            delay: 867,
             callback: () => {
                 this.addEnemy(enemyRedConfig, Math.random() * game.config.width);
-            }, loop: true
+            }, 
+            loop: true,
+            startAt: 0
         });
         this.time.addEvent({
-            delay: 3337,
+            delay: 2119,
             callback: () => {
                 this.addEnemy(enemyGreenConfig, Math.random() * game.config.width);
-            }, loop: true
+            }, 
+            loop: true,
+            startAt: -1000
         });
         this.time.addEvent({
-            delay: 7115,
+            delay: 5557,
             callback: () => {
                 this.addEnemy(enemyBlueConfig, Math.random() * game.config.width);
-            }, loop: true
+            }, 
+            loop: true,
+            startAt: -10000
         });
         this.time.addEvent({
             delay: 10000,
             callback: () => {
                 this.addEnemy(enemyYellowConfig, Math.random() * game.config.width);
-            }, loop: true
+            }, 
+            loop: true,
+            startAt: -30000
         });
 
         this.healthbar = this.add.tileSprite(30, 30, game.config.width - 60, 30, 'health', 0).setOrigin(0,0);
