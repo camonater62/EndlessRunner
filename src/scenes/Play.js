@@ -47,11 +47,18 @@ class Play extends Phaser.Scene {
             startFrame: 0,
             endFrame: 1
         });
+        this.load.spritesheet('explosion-sheet', './assets/explosion.png', {
+            frameWidth: 32,
+            frameHeight: 32,
+            startFrame: 0,
+            endFrame: 9
+        });
 
         this.load.image('bullet', './assets/bullet.png');
-
         
         this.load.image('ocean', './assets/ocean.png');
+
+        this.load.image('health', './assets/health.png');
     }
 
     create() {
@@ -63,6 +70,11 @@ class Play extends Phaser.Scene {
         this.player = new Player(this, game.config.width / 2, 3 * game.config.height / 4, 'player', 0, 750).setOrigin(0, 0);
         this.player.x -= this.player.width / 2;
 
+        this.anims.create({
+            key: 'explosion',
+            frames: this.anims.generateFrameNames('explosion-sheet', {start: 0, end: 9}),
+            frameRate: 30
+        });
 
         this.bulletGroup = this.physics.add.group({
             removeCallback: (bullet) => {
@@ -75,6 +87,11 @@ class Play extends Phaser.Scene {
             }
         });
 
+        this.physics.add.overlap(this.player, this.bulletGroup, (player, bullet) => {
+            bullet.remove = true;
+            player.health -= 2;
+        });
+
         this.enemyGroup = [];
         this.enemyPool = [];
         this.enemyConfigs = [];
@@ -84,10 +101,15 @@ class Play extends Phaser.Scene {
             startFrame: 0,
             endFrame: 1,
             // Behaviour
-            speed: 150,
+            speed: 200,
             shootInterval: 1000000, // This enemy doesn't shoot, so irrelevant number
             // Functions
-            moveFunction: defaultMovement,
+            moveFunction: (enemy) => {
+            //    enemy.y += enemy.speed;
+            //    enemy.x += cos(enemy.time);
+                enemy.setVelocityY(enemy.speed);
+                enemy.setVelocityX(enemy.speed * sin(enemy.time) * 0.5);
+            },
             fireFunction: defaultFire,
             deathFunction: defaultDeathCondition,
         };
@@ -98,12 +120,12 @@ class Play extends Phaser.Scene {
             startFrame: 0,
             endFrame: 1,
             // Behaviour
-            speed: 100,
+            speed: 150,
             shootInterval: 1000,
             moveFunction: defaultMovement,
             fireFunction: (enemy) => { 
                 // TODO: config
-                this.addBullet(enemy.x, enemy.y + enemy.height + 8, 200);
+                this.addBullet(enemy.x, enemy.y + enemy.height + 8, 400);
             },
             deathFunction: defaultDeathCondition,
         }
@@ -114,10 +136,16 @@ class Play extends Phaser.Scene {
             startFrame: 0,
             endFrame: 1,
             // Behaviour
-            speed: 200,
-            shootInterval: 1000000,
-            moveFunction: defaultMovement,
-            fireFunction: (enemy) => { /* TODO */ },
+            speed: 300,
+            shootInterval: 500,
+            moveFunction: (enemy) => {
+                enemy.setVelocityY(enemy.speed);
+                enemy.setVelocityX(enemy.speed * sin(5 * enemy.time))
+            },
+            fireFunction: (enemy) => { 
+                this.addBullet(1 * enemy.width / 3 + enemy.x, enemy.y + enemy.height + 8, 600);
+                this.addBullet(-1 * enemy.width / 3 + enemy.x, enemy.y + enemy.height + 8, 600);
+            },
             deathFunction: defaultDeathCondition,
         }
         this.addEnemyPoolGroupPair(enemyBlueConfig);
@@ -128,38 +156,52 @@ class Play extends Phaser.Scene {
             startFrame: 0,
             endFrame: 1,
             // Behaviour
-            speed: -200,
-            shootInterval: 1000000,
-            moveFunction: defaultMovement,
+            speed: -750,
+            shootInterval: 1000000, // doesn't shoot
+            moveFunction: (enemy) => {
+                enemy.setAccelerationY(enemy.speed);
+            },
             fireFunction: defaultFire,
             deathFunction: defaultDeathCondition,
         }
         this.addEnemyPoolGroupPair(enemyYellowConfig);
         
         this.time.addEvent({
-            delay: 500,
+            delay: 867,
             callback: () => {
-                this.addEnemy(enemyRedConfig, Math.random() * game.config.width);
-            }, loop: true
+                // TODO: remove special stuff ; make universal
+                let e = this.addEnemy(enemyRedConfig, 0.25 * game.config.width * sin(5 * this.gameTime) + this.game.config.width / 2);
+                e.time = Math.random() * this.gameTime;
+            }, 
+            loop: true,
+            startAt: 0
         });
         this.time.addEvent({
-            delay: 1000,
+            delay: 2119,
             callback: () => {
                 this.addEnemy(enemyGreenConfig, Math.random() * game.config.width);
-            }, loop: true
+            }, 
+            loop: true,
+            startAt: -1000
         });
         this.time.addEvent({
-            delay: 1500,
+            delay: 5557,
             callback: () => {
                 this.addEnemy(enemyBlueConfig, Math.random() * game.config.width);
-            }, loop: true
+            }, 
+            loop: true,
+            startAt: -10000
         });
         this.time.addEvent({
-            delay: 2000,
+            delay: 10000,
             callback: () => {
                 this.addEnemy(enemyYellowConfig, Math.random() * game.config.width);
-            }, loop: true
+            }, 
+            loop: true,
+            startAt: -30000
         });
+
+        this.healthbar = this.add.tileSprite(30, 30, game.config.width - 60, 30, 'health', 0).setOrigin(0,0);
 
         this.gameTime = 0;
     }
@@ -191,6 +233,9 @@ class Play extends Phaser.Scene {
                 this.bulletGroup.remove(bullet);
             }
         }, this);
+
+        this.healthbar.width = (this.game.config.width - 60) * (this.player.health / this.player.max_health);
+        this.children.bringToTop(this.healthbar);
     }
 
     
@@ -245,6 +290,8 @@ class Play extends Phaser.Scene {
         if (enemyConfig.y) {
             enemy.y = enemyConfig.y;
         }
+
+        return enemy;
     }
 
     addEnemyPoolGroupPair(enemyconfig) {
@@ -264,12 +311,28 @@ class Play extends Phaser.Scene {
         }));
         this.enemyConfigs.push(enemyconfig);
     
+        // TODO: Pool explosions?
         this.physics.add.overlap(this.bulletGroup, this.enemyGroup[index], (bullet, enemy) => {
             bullet.remove = true;
             enemy.remove = true;
+            let boom = this.add.sprite(enemy.x, enemy.y, 'health').setOrigin(0.5,0.5);
+            boom.scale = 2;
+            boom.anims.play('explosion');
+            boom.on('animationComplete', () => {
+                boom.alpha = 0;
+                boom.destroy();
+            });
         });
         this.physics.add.overlap(this.player, this.enemyGroup[index], (player, enemy) => {
             enemy.remove = true;
+            this.player.health -= 5;
+            let boom = this.add.sprite(enemy.x, enemy.y, 'health').setOrigin(0.5,0.5);
+            boom.scale = 2;
+            boom.anims.play('explosion');
+            boom.on('animationComplete', () => {
+                boom.alpha = 0;
+                boom.destroy();
+            });
         });
     }
 

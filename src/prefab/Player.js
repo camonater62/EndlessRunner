@@ -12,6 +12,8 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
 
         this.speed = speed;
+        this.max_health = 500;
+        this.health = this.max_health;
 
         this.anims.create({
             key: 'animation',
@@ -21,16 +23,16 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
         // Add to config
         this.shootTimer = scene.time.addEvent({
-            delay: 150,
+            delay: 200,
             callback: () => {
-                scene.addBullet(this.x + this.width / 2, this.y, -200);
+                scene.addBullet(this.x + this.width / 2, this.y - 25, -1.5 * this.speed);
             },
             loop: true,
             paused: true,
             startAt: 250
         });
         
-
+        // this.setCollideWorldBounds(true, game.config.width, game.config.height, 0);
     }
 
     update() {
@@ -38,27 +40,28 @@ class Player extends Phaser.Physics.Arcade.Sprite {
             this.anims.play('animation');
         }
 
-        // TODO: Make movement based of physics velocity 
-        // so that movement speed isn't tied to FPS
+        let velox = 0;
+        let veloy = 0;
+
         if (keyLEFT.isDown || keyA.isDown) {
-        //    this.x -= this.speed;
-            this.setVelocityX(-this.speed);
-        } else if (keyRIGHT.isDown || keyD.isDown) {
-        //    this.x += this.speed;
-            this.setVelocityX(this.speed);
-        } else {
-            this.setVelocityX(0);
-        }
+            velox -= this.speed;
+        } 
+        if (keyRIGHT.isDown || keyD.isDown) {
+            velox += this.speed;
+        } 
 
         if (keyUP.isDown || keyW.isDown) {
-        //    this.y -= this.speed;
-            this.setVelocityY(-this.speed);
+            veloy -= this.speed;
         } else if (keyDOWN.isDown || keyS.isDown) {
-        //    this.y += this.speed;
-            this.setVelocityY(this.speed);
-        } else {
-            this.setVelocityY(0);
+            veloy += this.speed;
+        } 
+
+        if (velox != 0 && veloy != 0) {
+            velox /= SQRT2;
+            veloy /= SQRT2;
         }
+        this.setVelocityX(velox);
+        this.setVelocityY(veloy);
 
         if (keySpace.isDown) {
             if (this.shootTimer.paused) {

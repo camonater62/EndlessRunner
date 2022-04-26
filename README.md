@@ -1,6 +1,6 @@
 ### HELLO HUMANS
 
-## This is Kaelen, speaker of the readme world
+## This is Kaelen, speaker of the readme world.
 
 # I am representative to the endless triumverate of runnerworld.
 # Today we wish to dazzle you with our endless runnerness.
