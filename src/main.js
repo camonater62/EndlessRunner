@@ -16,7 +16,7 @@ let config = {
     physics: {
         default: 'arcade',
         arcade: {
-            useTree: false,
+            useTree: true,
             gravity: { y: 0 },
             debug: true
         },

@@ -61,6 +61,7 @@ class Play extends Phaser.Scene {
 
         // TODO: Draw Player on top
         this.player = new Player(this, game.config.width / 2, 3 * game.config.height / 4, 'player', 0, 750).setOrigin(0, 0);
+        this.player.x -= this.player.width / 2;
 
 
         this.bulletGroup = this.physics.add.group({
