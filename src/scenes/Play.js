@@ -101,7 +101,7 @@ class Play extends Phaser.Scene {
             startFrame: 0,
             endFrame: 1,
             // Behaviour
-            speed: 200,
+            speed: 250,
             shootInterval: 1000000, // This enemy doesn't shoot, so irrelevant number
             // Functions
             moveFunction: (enemy) => {
@@ -120,7 +120,7 @@ class Play extends Phaser.Scene {
             startFrame: 0,
             endFrame: 1,
             // Behaviour
-            speed: 150,
+            speed: 200,
             shootInterval: 1000,
             moveFunction: defaultMovement,
             fireFunction: (enemy) => { 
@@ -140,7 +140,7 @@ class Play extends Phaser.Scene {
             shootInterval: 500,
             moveFunction: (enemy) => {
                 enemy.setVelocityY(enemy.speed);
-                enemy.setVelocityX(enemy.speed * sin(5 * enemy.time))
+                enemy.setVelocityX(enemy.speed * sin(2 * enemy.time))
             },
             fireFunction: (enemy) => { 
                 this.addBullet(1 * enemy.width / 3 + enemy.x, enemy.y + enemy.height + 8, 600);
@@ -212,6 +212,9 @@ class Play extends Phaser.Scene {
         this.ocean.tilePositionY = -75 * this.gameTime;
 
         this.player.update();
+        if (this.player.health <= 0) {
+            this.scene.start('menuScene');
+        }
 
         for (let i = 0; i < this.enemyGroup.length; i++) {
             this.enemyGroup[i].getChildren().forEach((enemy) => {

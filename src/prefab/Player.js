@@ -12,7 +12,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
 
         this.speed = speed;
-        this.max_health = 500;
+        this.max_health = 100;
         this.health = this.max_health;
 
         this.anims.create({
