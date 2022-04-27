@@ -4,10 +4,17 @@ class Bullet extends Phaser.Physics.Arcade.Sprite {
 
         // TODO: everything lol
         this.speed = speed;
+        this.scale = SCALE*1.5;
 
-
-        this.scale = .25;
-
+        this.anims.create({ 
+            key: 'animation',
+            frames: this.anims.generateFrameNames(texture, {
+                start: 0, 
+                end: 2, 
+            }),
+            frameRate: 12,
+            repeat: -1
+        });
         scene.add.existing(this);
         scene.physics.add.existing(this);
 
@@ -18,5 +25,8 @@ class Bullet extends Phaser.Physics.Arcade.Sprite {
         // TODO: more advanced movement
         // this.y -= this.speed / 60;
         this.setVelocityY(this.speed);
+        if (!this.anims.isPlaying) {
+            this.anims.play('animation');
+        }
     }
 }

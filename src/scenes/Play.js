@@ -17,35 +17,35 @@ class Play extends Phaser.Scene {
         keySpace = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
         // this.load.image('player', './assets/player-0.png');
-        this.load.spritesheet('player', './assets/player.png', {
-            frameWidth: 111, 
-            frameHeight: 51, 
-            startFrame: 0, 
-            endFrame: 1
+        this.load.spritesheet('player', './assets/Player-Sheet.png', {
+            frameWidth: 32,
+            frameHeight: 64,
+            startFrame: 2, 
+            endFrame: 2
         });
-        this.load.spritesheet('enemy1', './assets/firstenemy.png', {
+        this.load.spritesheet('enemy1', './assets/Asteroid_White.png', {
             frameWidth: 34,
-            frameHeight: 26,
+            frameHeight: 34,
             startFrame: 0,
-            endFrame: 1
+            endFrame: 0
         });
-        this.load.spritesheet('enemy2', './assets/secondenemy.png', {
-            frameWidth: 50,
+        this.load.spritesheet('enemy2', './assets/Enemy-Shooter-Sheet.png', {
+            frameWidth: 32,
+            frameHeight: 48,
+            startFrame: 0,
+            endFrame: 19
+        });
+        this.load.spritesheet('enemy3', './assets/Enemy-Large-Sheet.png', {
+            frameWidth: 64,
             frameHeight: 32,
             startFrame: 0,
-            endFrame: 1
+            endFrame: 15
         });
-        this.load.spritesheet('enemy3', './assets/thirdenemy.png', {
-            frameWidth: 86,
-            frameHeight: 54,
+        this.load.spritesheet('enemy4', './assets/Player-Sheet.png', {
+            frameWidth: 32,
+            frameHeight: 64,
             startFrame: 0,
-            endFrame: 1
-        });
-        this.load.spritesheet('enemy4', './assets/fourthenemy.png', {
-            frameWidth: 50,
-            frameHeight: 42,
-            startFrame: 0,
-            endFrame: 1
+            endFrame: 0
         });
         this.load.spritesheet('explosion-sheet', './assets/explosion.png', {
             frameWidth: 32,
@@ -53,8 +53,14 @@ class Play extends Phaser.Scene {
             startFrame: 0,
             endFrame: 9
         });
+        this.load.spritesheet('bullet', './assets/Bullet-Sheet.png', {
+            frameWidth: 10,
+            frameHeight: 10,
+            startFrame: 0,
+            endFrame: 2
+        });
 
-        this.load.image('bullet', './assets/bullet.png');
+        // this.load.image('bullet', './assets/bullet.png');
         
         this.load.image('ocean', './assets/ocean.png');
 
@@ -117,15 +123,15 @@ class Play extends Phaser.Scene {
         const enemyGreenConfig = {
             // Texture settings
             texture: 'enemy2',
-            startFrame: 0,
-            endFrame: 1,
+            startFrame: 9,
+            endFrame: 19,
             // Behaviour
             speed: 200,
             shootInterval: 1000,
             moveFunction: defaultMovement,
             fireFunction: (enemy) => { 
                 // TODO: config
-                this.addBullet(enemy.x, enemy.y + enemy.height + 8, 400);
+                this.addBullet(enemy.x, enemy.y + (enemy.height * SCALE) + 8, 300);
             },
             deathFunction: defaultDeathCondition,
         }
@@ -133,18 +139,18 @@ class Play extends Phaser.Scene {
         const enemyBlueConfig = {
             // Texture settings
             texture: 'enemy3',
-            startFrame: 0,
-            endFrame: 1,
+            startFrame: 9,
+            endFrame: 15,
             // Behaviour
-            speed: 300,
-            shootInterval: 500,
+            speed: 150,
+            shootInterval: 800,
             moveFunction: (enemy) => {
                 enemy.setVelocityY(enemy.speed);
-                enemy.setVelocityX(enemy.speed * sin(2 * enemy.time))
+                enemy.setVelocityX(enemy.speed * 2 * sin(2 * enemy.time))
             },
             fireFunction: (enemy) => { 
-                this.addBullet(1 * enemy.width / 3 + enemy.x, enemy.y + enemy.height + 8, 600);
-                this.addBullet(-1 * enemy.width / 3 + enemy.x, enemy.y + enemy.height + 8, 600);
+                this.addBullet(1 * enemy.width / 2 + enemy.x, enemy.y + (enemy.height * SCALE), 400);
+                this.addBullet(-1 * enemy.width / 2 + enemy.x, enemy.y + (enemy.height * SCALE), 400);
             },
             deathFunction: defaultDeathCondition,
         }
@@ -319,7 +325,7 @@ class Play extends Phaser.Scene {
             bullet.remove = true;
             enemy.remove = true;
             let boom = this.add.sprite(enemy.x, enemy.y, 'health').setOrigin(0.5,0.5);
-            boom.scale = 2;
+            boom.scale = SCALE*2;
             boom.anims.play('explosion');
             boom.on('animationComplete', () => {
                 boom.alpha = 0;
@@ -330,7 +336,7 @@ class Play extends Phaser.Scene {
             enemy.remove = true;
             this.player.health -= 5;
             let boom = this.add.sprite(enemy.x, enemy.y, 'health').setOrigin(0.5,0.5);
-            boom.scale = 2;
+            boom.scale = SCALE*2;
             boom.anims.play('explosion');
             boom.on('animationComplete', () => {
                 boom.alpha = 0;

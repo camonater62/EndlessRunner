@@ -17,13 +17,15 @@ let animations;
 class Enemy extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y, 
         {
-            texture, startFrame, endFrame, speed, shootInterval, 
+            texture, startFrame, endFrame, speed, shootInterval,
             deathFunction=defaultDeathCondition, 
             moveFunction=defaultMovement,
             fireFunction=defaultFire
         }) {
 
         super(scene, x, y, texture, startFrame);
+
+        this.scale = SCALE;
 
         this.speed = speed;
         this.shootInterval = shootInterval;
@@ -43,7 +45,8 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
                 start: startFrame, 
                 end: endFrame, 
             }),
-            frameRate: 20
+            frameRate: 12,
+            repeat: -1
         });
 
         this.shootTimer = scene.time.addEvent({

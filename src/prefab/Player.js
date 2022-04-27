@@ -8,6 +8,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         scene.physics.add.existing(this);
 
         this.texture.setFilter('NEAREST');
+        this.scale = SCALE/2;
         //this.scale = 0.6; // Would like to avoid this
 
 
@@ -17,8 +18,8 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
         this.anims.create({
             key: 'animation',
-            frames: this.anims.generateFrameNames(texture, {start: 0, end: 1, first: 0}),
-            frameRate: 20
+            frames: this.anims.generateFrameNames(texture, {start: 2, end: 2, first: 2}),
+            frameRate: 12
         });
 
         // Add to config
