@@ -12,7 +12,11 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         //this.scale = 0.6; // Would like to avoid this
 
 
-        this.speed = speed;
+        this.setMaxVelocity(speed)
+        this.ACCELERATION = speed*7;
+        this.DRAG = speed*6;
+        this.setDragX(this.DRAG);
+        this.setDragY(this.DRAG);
         this.max_health = 20;
         this.health = this.max_health;
 
@@ -26,7 +30,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.shootTimer = scene.time.addEvent({
             delay: 200,
             callback: () => {
-                scene.addBullet(this.x + this.width / 2, this.y - 25, -1.5 * this.speed);
+                scene.addBullet(this.x + this.width / 2, this.y - 25, -1.5 * speed);
             },
             loop: true,
             paused: true,
@@ -45,24 +49,45 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         let veloy = 0;
 
         if (keyLEFT.isDown || keyA.isDown) {
-            velox -= this.speed;
+            // velox -= this.speed;
+            if (!keyRIGHT.isDown || !keyD.isDown) {
+                this.setAccelerationX(-this.ACCELERATION);
+            }
+            else {this.setAccelerationX(0)};
         } 
-        if (keyRIGHT.isDown || keyD.isDown) {
-            velox += this.speed;
-        } 
+        else if (keyRIGHT.isDown || keyD.isDown) {
+            // velox += this.speed;
+            if (!keyLEFT.isDown || !keyA.isDown) {
+                this.setAccelerationX(this.ACCELERATION);
+            }
+            else {this.setAccelerationX(0)};
+        }
+        else {this.setAccelerationX(0)};
 
         if (keyUP.isDown || keyW.isDown) {
-            veloy -= this.speed;
-        } else if (keyDOWN.isDown || keyS.isDown) {
-            veloy += this.speed;
-        } 
-
-        if (velox != 0 && veloy != 0) {
-            velox /= SQRT2;
-            veloy /= SQRT2;
+            // veloy -= this.speed;
+            if (!keyDOWN.isDown || keyS.isDown) {
+                this.setAccelerationY(-this.ACCELERATION);
+            }
+            else {this.setAccelerationY(0)};
         }
-        this.setVelocityX(velox);
-        this.setVelocityY(veloy);
+        else if (keyDOWN.isDown || keyS.isDown) {
+            // veloy += this.speed;
+            if (!keyUP.isDown || !keyUP.isDown) {
+                this.setAccelerationY(this.ACCELERATION);
+            }
+            else {this.setAccelerationY(0)};
+        } 
+        else {
+            this.setAccelerationY(0);
+        }
+
+        // if (velox != 0 && veloy != 0) {
+        //     velox /= SQRT2;
+        //     veloy /= SQRT2;
+        // }
+        // this.setVelocityX(velox);
+        // this.setVelocityY(veloy);
 
         if (keySpace.isDown) {
             if (this.shootTimer.paused) {

@@ -107,7 +107,7 @@ class Play extends Phaser.Scene {
             startFrame: 0,
             endFrame: 1,
             // Behaviour
-            speed: 250,
+            speed: 50,
             shootInterval: 1000000, // This enemy doesn't shoot, so irrelevant number
             // Functions
             moveFunction: (enemy) => {
@@ -173,7 +173,7 @@ class Play extends Phaser.Scene {
         this.addEnemyPoolGroupPair(enemyYellowConfig);
         
         this.time.addEvent({
-            delay: 867,
+            delay: 2500,
             callback: () => {
                 // TODO: remove special stuff ; make universal
                 let e = this.addEnemy(enemyRedConfig, 0.25 * game.config.width * sin(5 * this.gameTime) + this.game.config.width / 2);
@@ -183,7 +183,7 @@ class Play extends Phaser.Scene {
             startAt: 0
         });
         this.time.addEvent({
-            delay: 2119,
+            delay: 800,
             callback: () => {
                 this.addEnemy(enemyGreenConfig, Math.random() * game.config.width);
             }, 
