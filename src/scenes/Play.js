@@ -124,6 +124,7 @@ class Play extends Phaser.Scene {
             if (bullet.team != 'player') {
                 bullet.remove = true;
                 player.hit(bullet);
+                this.screenshake(15, 8, 5);
             }
         });
 
@@ -360,7 +361,8 @@ class Play extends Phaser.Scene {
                 this.clearTint = this.time.delayedCall(125, () => {
                     enemy.clearTint();
                 }, null, this);
-    
+                
+                this.screenshake(3, 3, 6);
                 let boom = this.add.sprite(enemy.x, enemy.y, 'healthbar').setOrigin(0.5,0.5);
                 boom.scale = SCALE*2;
                 boom.anims.play('explosion');
@@ -376,6 +378,7 @@ class Play extends Phaser.Scene {
         this.physics.add.overlap(this.player, this.enemyGroup[index], (player, enemy) => {
             player.hit(enemy);
             enemy.explodinate();
+            this.screenshake(17, 8, 5)
             let boom = this.add.sprite(enemy.x, enemy.y, 'healthbar').setOrigin(0.5,0.5);
             boom.scale = SCALE*2;
             boom.anims.play('explosion');
@@ -393,5 +396,24 @@ class Play extends Phaser.Scene {
             }
         }
         return -1;
+    }
+
+    screenshake(intensity, delay, repeat) {
+        let cam = this.cameras.main;
+        let sign = 1;
+        this.shake = this.time.addEvent({
+            delay: delay,
+            callback: () => {
+                cam.x += sign*intensity * cos(this.gameTime*10);
+                cam.y -= sign*intensity * sin(this.gameTime*10);
+                sign *= -1;
+            }, 
+            repeat: repeat
+        });
+        //this.shake.
+        this.reset = this.time.delayedCall(delay*repeat*3, () => {
+            cam.x = 0;
+            cam.y = 0;
+        }, null, this);
     }
 }
