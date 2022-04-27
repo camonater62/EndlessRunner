@@ -115,7 +115,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
             this.health -= 5;
         }
         this.setTintFill(0xffffff);
-        this.scene.clearTint = this.scene.time.delayedCall(125, () => {
+        this.scene.clearTint = this.scene.time.delayedCall(250, () => {
             this.clearTint();
         }, null, this);
     }
