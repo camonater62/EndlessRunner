@@ -57,7 +57,7 @@ class Play extends Phaser.Scene {
             frameWidth: 10,
             frameHeight: 10,
             startFrame: 0,
-            endFrame: 2
+            endFrame: 11
         });
 
         // this.load.image('bullet', './assets/bullet.png');
@@ -81,6 +81,33 @@ class Play extends Phaser.Scene {
             frames: this.anims.generateFrameNames('explosion-sheet', {start: 0, end: 9}),
             frameRate: 30
         });
+        this.anims.create({
+            key: 'player-bullet',
+            frames: this.anims.generateFrameNames('bullet', {
+                start: 3,
+                end: 5,
+            }),
+            frameRate: 12,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'enemy-bullet',
+            frames: this.anims.generateFrameNumbers('bullet', {
+                start: 9, 
+                end: 11
+            }),
+            frameRate: 12,
+            repeat: -1
+        });
+        // this.anims.create({
+        //     key: 'neutral-bullet',
+        //     frames: this.anims.generateFrameNumbers('bullet', {
+        //         start: 0, 
+        //         end: 2
+        //     }),
+        //     frameRate: 12,
+        //     repeat: -1
+        // });
 
         this.bulletGroup = this.physics.add.group({
             removeCallback: (bullet) => {
@@ -94,8 +121,10 @@ class Play extends Phaser.Scene {
         });
 
         this.physics.add.overlap(this.player, this.bulletGroup, (player, bullet) => {
-            bullet.remove = true;
-            player.health -= 2;
+            if (bullet.team != 'player') {
+                bullet.remove = true;
+                player.hit(bullet);
+            }
         });
 
 
@@ -134,7 +163,7 @@ class Play extends Phaser.Scene {
             moveFunction: defaultMovement,
             fireFunction: (enemy) => { 
                 // TODO: config
-                this.addBullet(enemy.x, enemy.y + (enemy.height * SCALE) + 8, 300);
+                this.addBullet(enemy.x, enemy.y + (enemy.height * SCALE) + 8, 300, 'enemy');
             },
             deathFunction: defaultDeathCondition,
         }
@@ -153,8 +182,8 @@ class Play extends Phaser.Scene {
                 enemy.setVelocityX(enemy.speed * 2 * sin(2 * enemy.time))
             },
             fireFunction: (enemy) => { 
-                this.addBullet(1 * enemy.width / 2 + enemy.x, enemy.y + (enemy.height * SCALE), 400);
-                this.addBullet(-1 * enemy.width / 2 + enemy.x, enemy.y + (enemy.height * SCALE), 400);
+                this.addBullet(1 * enemy.width / 2 + enemy.x, enemy.y + (enemy.height * SCALE), 400, 'enemy');
+                this.addBullet(-1 * enemy.width / 2 + enemy.x, enemy.y + (enemy.height * SCALE), 400, 'enemy');
             },
             deathFunction: defaultDeathCondition,
         }
@@ -255,7 +284,7 @@ class Play extends Phaser.Scene {
     
 
     // TODO: config
-    addBullet(x, y, speed) {
+    addBullet(x, y, speed, team) {
         let bullet;
         if (this.bulletPool.getLength()) {
             bullet = this.bulletPool.getFirst();
@@ -270,7 +299,7 @@ class Play extends Phaser.Scene {
             this.bulletPool.remove(bullet);
         } else {
             // TODO: config
-            bullet = new Bullet(this, x, y, 'bullet', 0, speed);
+            bullet = new Bullet(this, x, y, 'bullet', 0, speed, team);
             this.bulletGroup.add(bullet);
         }
     }
@@ -285,14 +314,10 @@ class Play extends Phaser.Scene {
         }
         if (this.enemyPool[index].getLength()) {
             enemy = this.enemyPool[index].getFirst();
-            enemy.x = posX;
-            enemy.y = 0;
-           
-            enemy.time = 0;
-            enemy.active = true;
-            enemy.visible = true;
-            enemy.shootTimer.paused = false;
+            enemy.reset();
 
+            enemy.y = 0;
+            enemy.x = posX;
             enemy.remove = false;
 
             this.enemyPool[index].remove(enemy);
@@ -327,21 +352,29 @@ class Play extends Phaser.Scene {
     
         // TODO: Pool explosions?
         this.physics.add.overlap(this.bulletGroup, this.enemyGroup[index], (bullet, enemy) => {
-            bullet.remove = true;
-            enemy.health -= 1;
-            let boom = this.add.sprite(enemy.x, enemy.y, 'healthbar').setOrigin(0.5,0.5);
-            boom.scale = SCALE*2;
-            boom.anims.play('explosion');
-            boom.on('animationComplete', () => {
-                boom.alpha = 0;
-                boom.destroy();
-            });
-            if (enemy.health <= 0) {
-                enemy.explodinate();
-            }
+            if (bullet.team != 'enemy') {
+                bullet.remove = true;
+                enemy.health -= 1;
+                enemy.setTintFill(0xffffff);
+                this.clearTint = this.time.delayedCall(125, () => {
+                    enemy.clearTint();
+                }, null, this);
+    
+                let boom = this.add.sprite(enemy.x, enemy.y, 'healthbar').setOrigin(0.5,0.5);
+                boom.scale = SCALE*2;
+                boom.anims.play('explosion');
+                boom.on('animationComplete', () => {
+                    boom.alpha = 0;
+                    boom.destroy();
+                });
+                if (enemy.health <= 0) {
+                    enemy.explodinate();
+                };
+            };
         });
         this.physics.add.overlap(this.player, this.enemyGroup[index], (player, enemy) => {
-            player.health -= 5;
+            player.hit(enemy);
+            enemy.explodinate();
             let boom = this.add.sprite(enemy.x, enemy.y, 'healthbar').setOrigin(0.5,0.5);
             boom.scale = SCALE*2;
             boom.anims.play('explosion');
@@ -349,7 +382,6 @@ class Play extends Phaser.Scene {
                 boom.alpha = 0;
                 boom.destroy();
             });
-            enemy.explodinate();
         });
     }
 

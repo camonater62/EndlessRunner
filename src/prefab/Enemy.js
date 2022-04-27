@@ -56,15 +56,13 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
             callback: () => {fireFunction(this);},
             loop: true,
         });
+
+        this.anims.play('animation');
     }
 
     update() {
         // TODO: make time accurate (untie fps)
         this.time += 1 / game.config.fps;
-
-        if (!this.anims.isPlaying) {
-            this.anims.play('animation');
-        }
 
         this.moveFunction(this);
 
@@ -84,4 +82,14 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
         });
         this.remove = true;
     };
+
+    reset() {       
+        this.time = 0;
+        this.active = true;
+        this.visible = true;
+        this.shootTimer.paused = false;
+        this.clearTint();
+
+        this.health = this.maxHealth;
+    }
 }
