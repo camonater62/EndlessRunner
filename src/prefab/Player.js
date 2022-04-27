@@ -30,7 +30,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.shootTimer = scene.time.addEvent({
             delay: 200,         // 0 for laser!!
             callback: () => {
-                scene.addBullet(this.x + this.width / 2, this.y - 25, -1.5 * speed);
+                scene.addBullet(this.x + this.width / 2, this.y - 25, -1.5 * speed, 'player');
             },
             loop: true,
             paused: true,
@@ -105,5 +105,18 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
         this.y = max(min(game.config.height - this.height / 2, this.y), -this.height / 2);
         this.x = max(min(game.config.width - this.width / 2, this.x), -this.width / 2);
+    }
+
+    hit(objectType) {
+        if (objectType instanceof Bullet) {
+            this.health -= 2;
+        }
+        else if (objectType instanceof Enemy) {
+            this.health -= 5;
+        }
+        this.setTintFill(0xffffff);
+        this.scene.clearTint = this.scene.time.delayedCall(125, () => {
+            this.clearTint();
+        }, null, this);
     }
 }
