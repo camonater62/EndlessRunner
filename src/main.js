@@ -24,7 +24,9 @@ let config = {
             gravity: { y: 0 },
             debug: false
         },
-    }
+    },
+    pixelArt: true,
+
 };
 
 let highScore = localStorage.getItem('highScore');
