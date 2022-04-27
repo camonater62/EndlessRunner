@@ -28,7 +28,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
         // Add to config
         this.shootTimer = scene.time.addEvent({
-            delay: 200,
+            delay: 200,         // 0 for laser!!
             callback: () => {
                 scene.addBullet(this.x + this.width / 2, this.y - 25, -1.5 * speed);
             },

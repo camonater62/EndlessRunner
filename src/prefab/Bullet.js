@@ -4,7 +4,8 @@ class Bullet extends Phaser.Physics.Arcade.Sprite {
 
         // TODO: everything lol
         this.speed = speed;
-        this.scale = SCALE*1.5;
+        this.scale = SCALE*1.5
+        ;
 
         this.anims.create({ 
             key: 'animation',

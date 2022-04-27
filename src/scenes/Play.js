@@ -64,7 +64,7 @@ class Play extends Phaser.Scene {
         
         this.load.image('ocean', './assets/ocean.png');
 
-        this.load.image('health', './assets/health.png');
+        this.load.image('healthbar', './assets/health.png');
     }
 
     create() {
@@ -98,6 +98,7 @@ class Play extends Phaser.Scene {
             player.health -= 2;
         });
 
+
         this.enemyGroup = [];
         this.enemyPool = [];
         this.enemyConfigs = [];
@@ -105,10 +106,11 @@ class Play extends Phaser.Scene {
             // Texture settings
             texture: 'enemy1',
             startFrame: 0,
-            endFrame: 1,
+            endFrame: 0,
             // Behaviour
             speed: 50,
             shootInterval: 1000000, // This enemy doesn't shoot, so irrelevant number
+            health: 3,
             // Functions
             moveFunction: (enemy) => {
             //    enemy.y += enemy.speed;
@@ -128,6 +130,7 @@ class Play extends Phaser.Scene {
             // Behaviour
             speed: 200,
             shootInterval: 1000,
+            health: 2,
             moveFunction: defaultMovement,
             fireFunction: (enemy) => { 
                 // TODO: config
@@ -144,6 +147,7 @@ class Play extends Phaser.Scene {
             // Behaviour
             speed: 150,
             shootInterval: 800,
+            health: 4,
             moveFunction: (enemy) => {
                 enemy.setVelocityY(enemy.speed);
                 enemy.setVelocityX(enemy.speed * 2 * sin(2 * enemy.time))
@@ -164,6 +168,7 @@ class Play extends Phaser.Scene {
             // Behaviour
             speed: -750,
             shootInterval: 1000000, // doesn't shoot
+            health: 2,
             moveFunction: (enemy) => {
                 enemy.setAccelerationY(enemy.speed);
             },
@@ -191,12 +196,12 @@ class Play extends Phaser.Scene {
             startAt: -1000
         });
         this.time.addEvent({
-            delay: 5557,
+            delay: 5000,          // 5000
             callback: () => {
-                this.addEnemy(enemyBlueConfig, Math.random() * game.config.width);
+                this.addEnemy(enemyBlueConfig, Math.random() * game.config.width/2);
             }, 
             loop: true,
-            startAt: -10000
+            startAt: -10000     // -10000
         });
         this.time.addEvent({
             delay: 10000,
@@ -207,7 +212,7 @@ class Play extends Phaser.Scene {
             startAt: -30000
         });
 
-        this.healthbar = this.add.tileSprite(30, 30, game.config.width - 60, 30, 'health', 0).setOrigin(0,0);
+        this.healthbar = this.add.tileSprite(30, 30, game.config.width - 60, 30, 'healthbar', 0).setOrigin(0,0);
 
         this.gameTime = 0;
     }
@@ -323,25 +328,28 @@ class Play extends Phaser.Scene {
         // TODO: Pool explosions?
         this.physics.add.overlap(this.bulletGroup, this.enemyGroup[index], (bullet, enemy) => {
             bullet.remove = true;
-            enemy.remove = true;
-            let boom = this.add.sprite(enemy.x, enemy.y, 'health').setOrigin(0.5,0.5);
+            enemy.health -= 1;
+            let boom = this.add.sprite(enemy.x, enemy.y, 'healthbar').setOrigin(0.5,0.5);
             boom.scale = SCALE*2;
             boom.anims.play('explosion');
             boom.on('animationComplete', () => {
                 boom.alpha = 0;
                 boom.destroy();
             });
+            if (enemy.health <= 0) {
+                enemy.explodinate();
+            }
         });
         this.physics.add.overlap(this.player, this.enemyGroup[index], (player, enemy) => {
-            enemy.remove = true;
-            this.player.health -= 5;
-            let boom = this.add.sprite(enemy.x, enemy.y, 'health').setOrigin(0.5,0.5);
+            player.health -= 5;
+            let boom = this.add.sprite(enemy.x, enemy.y, 'healthbar').setOrigin(0.5,0.5);
             boom.scale = SCALE*2;
             boom.anims.play('explosion');
             boom.on('animationComplete', () => {
                 boom.alpha = 0;
                 boom.destroy();
             });
+            enemy.explodinate();
         });
     }
 
