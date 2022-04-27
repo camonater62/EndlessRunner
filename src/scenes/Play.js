@@ -23,11 +23,11 @@ class Play extends Phaser.Scene {
             startFrame: 2, 
             endFrame: 2
         });
-        this.load.spritesheet('enemy1', './assets/Asteroid_White.png', {
-            frameWidth: 34,
-            frameHeight: 34,
+        this.load.spritesheet('enemy1', './assets/Enemy-Tiny-Sheet.png', {
+            frameWidth: 16,
+            frameHeight: 16,
             startFrame: 0,
-            endFrame: 0
+            endFrame: 1
         });
         this.load.spritesheet('enemy2', './assets/Enemy-Shooter-Sheet.png', {
             frameWidth: 32,
@@ -59,11 +59,16 @@ class Play extends Phaser.Scene {
             startFrame: 0,
             endFrame: 11
         });
+        this.load.spritesheet('asteroid', './assets/Asteroid_White.png', {
+            frameWidth: 32,
+            frameHeight: 32,
+            startFrame: 0,
+            endFrame: 0,
+        });
 
         // this.load.image('bullet', './assets/bullet.png');
         
         this.load.image('ocean', './assets/ocean.png');
-
         this.load.image('healthbar', './assets/health.png');
     }
 
@@ -136,11 +141,26 @@ class Play extends Phaser.Scene {
             // Texture settings
             texture: 'enemy1',
             startFrame: 0,
-            endFrame: 0,
+            endFrame: 1,
             // Behaviour
-            speed: 50,
+            speed: 250,
             shootInterval: 1000000, // This enemy doesn't shoot, so irrelevant number
-            health: 3,
+            health: 1,
+            // Functions
+            moveFunction: defaultMovement,
+            fireFunction: defaultFire,
+            deathFunction: defaultDeathCondition,
+        };
+        this.addEnemyPoolGroupPair(enemyRedConfig);
+        const asteroidConfig = {
+            // Texture settings
+            texture: 'asteroid',
+            startFrame: 0,
+            endFrame: 0,
+            // Behavior
+            speed: 80,
+            shootInterval: 1000000,
+            health: 4,
             // Functions
             moveFunction: (enemy) => {
             //    enemy.y += enemy.speed;
@@ -151,14 +171,14 @@ class Play extends Phaser.Scene {
             fireFunction: defaultFire,
             deathFunction: defaultDeathCondition,
         };
-        this.addEnemyPoolGroupPair(enemyRedConfig);
+        this.addEnemyPoolGroupPair(asteroidConfig);
         const enemyGreenConfig = {
             // Texture settings
             texture: 'enemy2',
             startFrame: 9,
             endFrame: 19,
             // Behaviour
-            speed: 200,
+            speed: 150,
             shootInterval: 1000,
             health: 2,
             moveFunction: defaultMovement,
@@ -208,22 +228,29 @@ class Play extends Phaser.Scene {
         this.addEnemyPoolGroupPair(enemyYellowConfig);
         
         this.time.addEvent({
-            delay: 2500,
+            delay: 750,
             callback: () => {
                 // TODO: remove special stuff ; make universal
-                let e = this.addEnemy(enemyRedConfig, 0.25 * game.config.width * sin(5 * this.gameTime) + this.game.config.width / 2);
-                e.time = Math.random() * this.gameTime;
+                this.addEnemyWave(enemyRedConfig, 3, 250);
             }, 
             loop: true,
-            startAt: 0
+            startAt: 5000
         });
+        this.time.addEvent({ 
+            delay: 2700,
+            callback: () => {
+                this.addEnemy(asteroidConfig, Math.random() * game.config.width);
+            },
+            loop: true,
+            startAt: 0
+        })
         this.time.addEvent({
-            delay: 800,
+            delay: 1500,
             callback: () => {
                 this.addEnemy(enemyGreenConfig, Math.random() * game.config.width);
             }, 
             loop: true,
-            startAt: -1000
+            startAt: -1500
         });
         this.time.addEvent({
             delay: 5000,          // 5000
@@ -348,6 +375,26 @@ class Play extends Phaser.Scene {
         }
 
         return enemy;
+    }
+
+    addEnemyWave(enemyConfig, amount, wait) {
+        let baseX = (Math.random() * this.game.config.width)
+        if (baseX < this.game.config.width * 0.25) {
+            baseX = this.game.config.width * 0.25
+        }
+        else if (baseX > this.game.config.width * .75) {
+            baseX = this.game.config.width * .75
+        }
+        this.time.addEvent({
+            delay: wait,
+            callback: () => {
+                // TODO: remove special stuff ; make universal
+                let e = this.addEnemy(enemyConfig, baseX * sin(5 * this.gameTime));
+                e.time = Math.random() * this.gameTime;
+            }, 
+            repeat: amount,
+            startAt: 0
+        });
     }
 
     addEnemyPoolGroupPair(enemyconfig) {
