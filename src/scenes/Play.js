@@ -177,9 +177,9 @@ class Play extends Phaser.Scene {
             speed: 150,
             shootInterval: 800,
             health: 4,
-            moveFunction: (enemy) => {
+            moveFunction: (enemy, delta) => {
                 enemy.setVelocityY(enemy.speed);
-                enemy.setVelocityX(enemy.speed * 2 * sin(2 * enemy.time))
+                enemy.setVelocityX(enemy.speed * sin(enemy.time / 500))
             },
             fireFunction: (enemy) => { 
                 this.addBullet(1 * enemy.width / 2 + enemy.x, enemy.y + (enemy.height * SCALE), 400, 'enemy');
@@ -246,19 +246,19 @@ class Play extends Phaser.Scene {
         this.gameTime = 0;
     }
 
-    update() {
+    update(time, delta) {
         this.gameTime += 1 / this.game.config.fps;
 
         this.ocean.tilePositionY = -75 * this.gameTime;
 
-        this.player.update();
+        this.player.update(delta);
         if (this.player.health <= 0) {
             this.scene.start('menuScene');
         }
 
         for (let i = 0; i < this.enemyGroup.length; i++) {
             this.enemyGroup[i].getChildren().forEach((enemy) => {
-                enemy.update();
+                enemy.update(delta);
                 // TODO: Consider enemy death
                 if (enemy.remove || enemy.deathFunction(enemy)) {
                     this.enemyGroup[i].killAndHide(enemy);
@@ -269,7 +269,7 @@ class Play extends Phaser.Scene {
 
         this.bulletGroup.getChildren().forEach((bullet) => {
             // // TODO: advanced movement
-            bullet.update();
+            bullet.update(delta);
             // // TODO: better death condition
             if (bullet.remove || bullet.y < 0 || bullet.y > this.game.config.height) {
                 this.bulletGroup.killAndHide(bullet);
@@ -293,8 +293,9 @@ class Play extends Phaser.Scene {
             bullet.speed = speed;
             bullet.active = true;
             bullet.visible = true;
-
+            bullet.team = team;
             bullet.remove = false;
+            bullet.updateAnimation();
             // TODO: config
             this.bulletPool.remove(bullet);
         } else {

@@ -7,25 +7,29 @@ class Bullet extends Phaser.Physics.Arcade.Sprite {
         this.team = team;
         this.speed = speed;
         this.scale = SCALE*1.5;
-        console.log(team);
-        if (team == 'player') {
-            this.anims.play('player-bullet');
-        }
-        else if (team == 'enemy') {
-            this.anims.play('enemy-bullet');
-        }
-        else {
-            this.anims.play('neutral-bullet');
-        }
+       
+        this.updateAnimation();
+        
         scene.add.existing(this);
         scene.physics.add.existing(this);
 
         this.remove = false;        
     }
 
-    update() {
+    update(delta) {
         // TODO: more advanced movement
-        // this.y -= this.speed / 60;
         this.setVelocityY(this.speed);
+    }
+
+    updateAnimation() {
+        if (this.team == 'player') {
+            this.anims.play('player-bullet');
+        }
+        else if (this.team == 'enemy') {
+            this.anims.play('enemy-bullet');
+        }
+        else {
+            this.anims.play('neutral-bullet');
+        }
     }
 }

@@ -2,7 +2,7 @@ const defaultDeathCondition = (enemy) => {
     return enemy.y > game.config.height;
 };
 
-const defaultMovement = (enemy) => {
+const defaultMovement = (enemy, delta) => {
     // enemy.y += enemy.speed;
     enemy.setVelocityY(enemy.speed);
 }
@@ -60,11 +60,13 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.anims.play('animation');
     }
 
-    update() {
+    update(delta) {
         // TODO: make time accurate (untie fps)
-        this.time += 1 / game.config.fps;
+        this.time += delta;
 
-        this.moveFunction(this);
+        this.moveFunction(this, delta);
+
+        // TODO: Change enemy angle based off velocity
 
         if (this.health <= 0) {                 // FOR DEBUGGING; displays explosions at top
             this.explodinate();                 // dunno why, ships are dying before getting to bottom
