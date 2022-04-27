@@ -180,7 +180,7 @@ class Play extends Phaser.Scene {
             health: 4,
             moveFunction: (enemy, delta) => {
                 enemy.setVelocityY(enemy.speed);
-                enemy.setVelocityX(enemy.speed * sin(enemy.time / 500))
+                enemy.setVelocityX(enemy.speed * sin(5 * enemy.time))
             },
             fireFunction: (enemy) => { 
                 this.addBullet(1 * enemy.width / 2 + enemy.x, enemy.y + (enemy.height * SCALE), 400, 'enemy');
@@ -298,8 +298,6 @@ class Play extends Phaser.Scene {
         cam.x = max(min(cam.x, MAXDIST), -MAXDIST);
         cam.y = max(min(cam.y, MAXDIST), -MAXDIST);
     }
-
-    
 
     // TODO: config
     addBullet(x, y, speed, team) {

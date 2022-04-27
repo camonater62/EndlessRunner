@@ -27,6 +27,9 @@ let config = {
             debug: false
         },
     },
+    scale: {
+        mode: Phaser.Scale.FIT,
+    },
     pixelArt: true,
 
 };

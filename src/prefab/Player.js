@@ -13,7 +13,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
 
         this.setMaxVelocity(speed)
-        this.ACCELERATION = speed*7;
+        this.ACCELERATION = speed*10;
         this.DRAG = speed*6;
         this.setDragX(this.DRAG);
         this.setDragY(this.DRAG);
