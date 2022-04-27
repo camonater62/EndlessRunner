@@ -124,7 +124,7 @@ class Play extends Phaser.Scene {
             if (bullet.team != 'player') {
                 bullet.remove = true;
                 player.hit(bullet);
-                this.screenshake(15, 8, 5);
+                this.screenshake(25, 1);
             }
         });
 
@@ -244,13 +244,15 @@ class Play extends Phaser.Scene {
 
         this.healthbar = this.add.tileSprite(30, 30, game.config.width - 60, 30, 'healthbar', 0).setOrigin(0,0);
 
-        this.gameTime = 0;
+        this.shakeCount = 0;
+        this.shakeIntensity = 0;
     }
 
     update(time, delta) {
-        this.gameTime += 1 / this.game.config.fps;
+        this.gameTime = time;
+        delta /= 1000; // ms -> s
 
-        this.ocean.tilePositionY = -75 * this.gameTime;
+        this.ocean.tilePositionY -= delta * 200;
 
         this.player.update(delta);
         if (this.player.health <= 0) {
@@ -280,6 +282,21 @@ class Play extends Phaser.Scene {
 
         this.healthbar.width = (this.game.config.width - 60) * (this.player.health / this.player.max_health);
         this.children.bringToTop(this.healthbar);
+
+        let cam = this.cameras.main;
+        if (this.shakeCount > 0) {
+            cam.x += 10 * delta * this.shakeIntensity * cos(time*10);
+            cam.y -= 10 * delta * this.shakeIntensity * sin(time*10);
+            this.shakeIntensity -= 0.95 * this.shakeIntensity * delta;
+            this.shakeCount -= 10 * delta;
+        } else {
+            cam.x *= 0.85;
+            cam.y *= 0.85;
+        }
+
+        const MAXDIST = 20;
+        cam.x = max(min(cam.x, MAXDIST), -MAXDIST);
+        cam.y = max(min(cam.y, MAXDIST), -MAXDIST);
     }
 
     
@@ -362,7 +379,7 @@ class Play extends Phaser.Scene {
                     enemy.clearTint();
                 }, null, this);
                 
-                this.screenshake(3, 3, 6);
+                this.screenshake(10, 1);
                 let boom = this.add.sprite(enemy.x, enemy.y, 'healthbar').setOrigin(0.5,0.5);
                 boom.scale = SCALE*2;
                 boom.anims.play('explosion');
@@ -378,7 +395,7 @@ class Play extends Phaser.Scene {
         this.physics.add.overlap(this.player, this.enemyGroup[index], (player, enemy) => {
             player.hit(enemy);
             enemy.explodinate();
-            this.screenshake(17, 8, 5)
+            this.screenshake(50, 1.5)
             let boom = this.add.sprite(enemy.x, enemy.y, 'healthbar').setOrigin(0.5,0.5);
             boom.scale = SCALE*2;
             boom.anims.play('explosion');
@@ -398,22 +415,8 @@ class Play extends Phaser.Scene {
         return -1;
     }
 
-    screenshake(intensity, delay, repeat) {
-        let cam = this.cameras.main;
-        let sign = 1;
-        this.shake = this.time.addEvent({
-            delay: delay,
-            callback: () => {
-                cam.x += sign*intensity * cos(this.gameTime*10);
-                cam.y -= sign*intensity * sin(this.gameTime*10);
-                sign *= -1;
-            }, 
-            repeat: repeat
-        });
-        //this.shake.
-        this.reset = this.time.delayedCall(delay*repeat*3, () => {
-            cam.x = 0;
-            cam.y = 0;
-        }, null, this);
+    screenshake(intensity, count) {
+        this.shakeCount = max(this.shakeCount, count);
+        this.shakeIntensity = max(this.shakeIntensity, intensity);
     }
 }
