@@ -11,6 +11,8 @@ const abs = Math.abs;
 
 const SQRT2 = sqrt(2);
 
+let SCALE = 2;
+
 let config = {
     type: Phaser.AUTO,
     width: 720,

@@ -17,35 +17,35 @@ class Play extends Phaser.Scene {
         keySpace = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
         // this.load.image('player', './assets/player-0.png');
-        this.load.spritesheet('player', './assets/player.png', {
-            frameWidth: 111, 
-            frameHeight: 51, 
-            startFrame: 0, 
-            endFrame: 1
+        this.load.spritesheet('player', './assets/Player-Sheet.png', {
+            frameWidth: 32,
+            frameHeight: 64,
+            startFrame: 2, 
+            endFrame: 2
         });
-        this.load.spritesheet('enemy1', './assets/firstenemy.png', {
+        this.load.spritesheet('enemy1', './assets/Asteroid_White.png', {
             frameWidth: 34,
-            frameHeight: 26,
+            frameHeight: 34,
             startFrame: 0,
-            endFrame: 1
+            endFrame: 0
         });
-        this.load.spritesheet('enemy2', './assets/secondenemy.png', {
-            frameWidth: 50,
+        this.load.spritesheet('enemy2', './assets/Enemy-Shooter-Sheet.png', {
+            frameWidth: 32,
+            frameHeight: 48,
+            startFrame: 0,
+            endFrame: 19
+        });
+        this.load.spritesheet('enemy3', './assets/Enemy-Large-Sheet.png', {
+            frameWidth: 64,
             frameHeight: 32,
             startFrame: 0,
-            endFrame: 1
+            endFrame: 15
         });
-        this.load.spritesheet('enemy3', './assets/thirdenemy.png', {
-            frameWidth: 86,
-            frameHeight: 54,
+        this.load.spritesheet('enemy4', './assets/Player-Sheet.png', {
+            frameWidth: 32,
+            frameHeight: 64,
             startFrame: 0,
-            endFrame: 1
-        });
-        this.load.spritesheet('enemy4', './assets/fourthenemy.png', {
-            frameWidth: 50,
-            frameHeight: 42,
-            startFrame: 0,
-            endFrame: 1
+            endFrame: 0
         });
         this.load.spritesheet('explosion-sheet', './assets/explosion.png', {
             frameWidth: 32,
@@ -53,12 +53,18 @@ class Play extends Phaser.Scene {
             startFrame: 0,
             endFrame: 9
         });
+        this.load.spritesheet('bullet', './assets/Bullet-Sheet.png', {
+            frameWidth: 10,
+            frameHeight: 10,
+            startFrame: 0,
+            endFrame: 2
+        });
 
-        this.load.image('bullet', './assets/bullet.png');
+        // this.load.image('bullet', './assets/bullet.png');
         
         this.load.image('ocean', './assets/ocean.png');
 
-        this.load.image('health', './assets/health.png');
+        this.load.image('healthbar', './assets/health.png');
     }
 
     create() {
@@ -92,6 +98,7 @@ class Play extends Phaser.Scene {
             player.health -= 2;
         });
 
+
         this.enemyGroup = [];
         this.enemyPool = [];
         this.enemyConfigs = [];
@@ -99,10 +106,11 @@ class Play extends Phaser.Scene {
             // Texture settings
             texture: 'enemy1',
             startFrame: 0,
-            endFrame: 1,
+            endFrame: 0,
             // Behaviour
-            speed: 250,
+            speed: 50,
             shootInterval: 1000000, // This enemy doesn't shoot, so irrelevant number
+            health: 3,
             // Functions
             moveFunction: (enemy) => {
             //    enemy.y += enemy.speed;
@@ -117,15 +125,16 @@ class Play extends Phaser.Scene {
         const enemyGreenConfig = {
             // Texture settings
             texture: 'enemy2',
-            startFrame: 0,
-            endFrame: 1,
+            startFrame: 9,
+            endFrame: 19,
             // Behaviour
             speed: 200,
             shootInterval: 1000,
+            health: 2,
             moveFunction: defaultMovement,
             fireFunction: (enemy) => { 
                 // TODO: config
-                this.addBullet(enemy.x, enemy.y + enemy.height + 8, 400);
+                this.addBullet(enemy.x, enemy.y + (enemy.height * SCALE) + 8, 300);
             },
             deathFunction: defaultDeathCondition,
         }
@@ -133,18 +142,19 @@ class Play extends Phaser.Scene {
         const enemyBlueConfig = {
             // Texture settings
             texture: 'enemy3',
-            startFrame: 0,
-            endFrame: 1,
+            startFrame: 9,
+            endFrame: 15,
             // Behaviour
-            speed: 300,
-            shootInterval: 500,
+            speed: 150,
+            shootInterval: 800,
+            health: 4,
             moveFunction: (enemy) => {
                 enemy.setVelocityY(enemy.speed);
-                enemy.setVelocityX(enemy.speed * sin(2 * enemy.time))
+                enemy.setVelocityX(enemy.speed * 2 * sin(2 * enemy.time))
             },
             fireFunction: (enemy) => { 
-                this.addBullet(1 * enemy.width / 3 + enemy.x, enemy.y + enemy.height + 8, 600);
-                this.addBullet(-1 * enemy.width / 3 + enemy.x, enemy.y + enemy.height + 8, 600);
+                this.addBullet(1 * enemy.width / 2 + enemy.x, enemy.y + (enemy.height * SCALE), 400);
+                this.addBullet(-1 * enemy.width / 2 + enemy.x, enemy.y + (enemy.height * SCALE), 400);
             },
             deathFunction: defaultDeathCondition,
         }
@@ -158,6 +168,7 @@ class Play extends Phaser.Scene {
             // Behaviour
             speed: -750,
             shootInterval: 1000000, // doesn't shoot
+            health: 2,
             moveFunction: (enemy) => {
                 enemy.setAccelerationY(enemy.speed);
             },
@@ -167,7 +178,7 @@ class Play extends Phaser.Scene {
         this.addEnemyPoolGroupPair(enemyYellowConfig);
         
         this.time.addEvent({
-            delay: 867,
+            delay: 2500,
             callback: () => {
                 // TODO: remove special stuff ; make universal
                 let e = this.addEnemy(enemyRedConfig, 0.25 * game.config.width * sin(5 * this.gameTime) + this.game.config.width / 2);
@@ -177,7 +188,7 @@ class Play extends Phaser.Scene {
             startAt: 0
         });
         this.time.addEvent({
-            delay: 2119,
+            delay: 800,
             callback: () => {
                 this.addEnemy(enemyGreenConfig, Math.random() * game.config.width);
             }, 
@@ -185,12 +196,12 @@ class Play extends Phaser.Scene {
             startAt: -1000
         });
         this.time.addEvent({
-            delay: 5557,
+            delay: 5000,          // 5000
             callback: () => {
-                this.addEnemy(enemyBlueConfig, Math.random() * game.config.width);
+                this.addEnemy(enemyBlueConfig, Math.random() * game.config.width/2);
             }, 
             loop: true,
-            startAt: -10000
+            startAt: -10000     // -10000
         });
         this.time.addEvent({
             delay: 10000,
@@ -201,7 +212,7 @@ class Play extends Phaser.Scene {
             startAt: -30000
         });
 
-        this.healthbar = this.add.tileSprite(30, 30, game.config.width - 60, 30, 'health', 0).setOrigin(0,0);
+        this.healthbar = this.add.tileSprite(30, 30, game.config.width - 60, 30, 'healthbar', 0).setOrigin(0,0);
 
         this.gameTime = 0;
     }
@@ -317,25 +328,28 @@ class Play extends Phaser.Scene {
         // TODO: Pool explosions?
         this.physics.add.overlap(this.bulletGroup, this.enemyGroup[index], (bullet, enemy) => {
             bullet.remove = true;
-            enemy.remove = true;
-            let boom = this.add.sprite(enemy.x, enemy.y, 'health').setOrigin(0.5,0.5);
-            boom.scale = 2;
+            enemy.health -= 1;
+            let boom = this.add.sprite(enemy.x, enemy.y, 'healthbar').setOrigin(0.5,0.5);
+            boom.scale = SCALE*2;
             boom.anims.play('explosion');
             boom.on('animationComplete', () => {
                 boom.alpha = 0;
                 boom.destroy();
             });
+            if (enemy.health <= 0) {
+                enemy.explodinate();
+            }
         });
         this.physics.add.overlap(this.player, this.enemyGroup[index], (player, enemy) => {
-            enemy.remove = true;
-            this.player.health -= 5;
-            let boom = this.add.sprite(enemy.x, enemy.y, 'health').setOrigin(0.5,0.5);
-            boom.scale = 2;
+            player.health -= 5;
+            let boom = this.add.sprite(enemy.x, enemy.y, 'healthbar').setOrigin(0.5,0.5);
+            boom.scale = SCALE*2;
             boom.anims.play('explosion');
             boom.on('animationComplete', () => {
                 boom.alpha = 0;
                 boom.destroy();
             });
+            enemy.explodinate();
         });
     }
 

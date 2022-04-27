@@ -17,7 +17,7 @@ let animations;
 class Enemy extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y, 
         {
-            texture, startFrame, endFrame, speed, shootInterval, 
+            texture, startFrame, endFrame, speed, shootInterval, health,
             deathFunction=defaultDeathCondition, 
             moveFunction=defaultMovement,
             fireFunction=defaultFire
@@ -25,6 +25,10 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
 
         super(scene, x, y, texture, startFrame);
 
+        this.scale = SCALE;
+
+        this.maxHealth = health;
+        this.health = this.maxHealth;
         this.speed = speed;
         this.shootInterval = shootInterval;
 
@@ -43,7 +47,8 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
                 start: startFrame, 
                 end: endFrame, 
             }),
-            frameRate: 20
+            frameRate: 12,
+            repeat: -1
         });
 
         this.shootTimer = scene.time.addEvent({
@@ -62,5 +67,21 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
         }
 
         this.moveFunction(this);
+
+        if (this.health <= 0) {                 // FOR DEBUGGING; displays explosions at top
+            this.explodinate();                 // dunno why, ships are dying before getting to bottom
+        }                                       // maybe need to have enemy bullets and player bullets
     }
+
+    explodinate() {
+        // Destruction of being if health gets too low
+        let boom = this.scene.add.sprite(this.x, this.y, 'healthbar').setOrigin(0.5,0.5);
+        boom.scale = SCALE*2;
+        boom.anims.play('explosion');
+        boom.on('animationComplete', () => {
+            boom.alpha = 0;
+            boom.destroy();
+        });
+        this.remove = true;
+    };
 }
