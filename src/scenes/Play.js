@@ -70,6 +70,7 @@ class Play extends Phaser.Scene {
         
         this.load.image('ocean', './assets/ocean.png');
         this.load.image('healthbar', './assets/health.png');
+        this.load.image('healthbar-outline', './assets/helfbah.png');
     }
 
     create() {
@@ -129,7 +130,7 @@ class Play extends Phaser.Scene {
             if (bullet.team != 'player') {
                 bullet.remove = true;
                 player.hit(bullet.damage);
-                this.updateHealthBar(bullet.damage);
+                this.updateHealthBar();
                 this.screenshake(35, 1);
             }
         });
@@ -221,7 +222,7 @@ class Play extends Phaser.Scene {
             startFrame: 0,
             endFrame: 1,
             // Behaviour
-            speed: -750,
+            speed: -500,
             shootInterval: 1000000, // doesn't shoot
             health: 10,
             damage: 8,
@@ -278,6 +279,7 @@ class Play extends Phaser.Scene {
         this.healthbar = this.add.tileSprite(30, 30, game.config.width - 60, 30, 'healthbar', 0).setOrigin(0,0);
         this.damagebar = this.add.tileSprite(30, 30, game.config.width - 60, 30, 'healthbar', 0).setOrigin(0,0);
         this.damagebar.setTintFill(0xffffff);
+        this.healthOutline = this.add.image(30, 30, 'healthbar-outline').setOrigin(0, 0).setScale(SCALE);
 
         this.shakeCount = 0;
         this.shakeIntensity = 0;
@@ -317,6 +319,7 @@ class Play extends Phaser.Scene {
         // Set Z values to highest for healths
         this.children.bringToTop(this.damagebar);
         this.children.bringToTop(this.healthbar);
+        this.children.bringToTop(this.healthOutline);
 
         let cam = this.cameras.main;
         if (this.shakeCount > 0) {
@@ -432,7 +435,7 @@ class Play extends Phaser.Scene {
         });
         this.physics.add.overlap(this.player, this.enemyGroup[index], (player, enemy) => {
             player.hit(enemy.damage);
-            this.updateHealthBar(enemy.damage);
+            this.updateHealthBar();
             enemy.explodinate();
             this.screenshake(50, 1.5)
             let boom = this.add.sprite(enemy.x, enemy.y, 'healthbar').setOrigin(0.5,0.5);
@@ -445,21 +448,18 @@ class Play extends Phaser.Scene {
         });
     }
 
-    updateHealthBar(damage) {
-        console.log(damage);
+    updateHealthBar() {
         let width = (this.game.config.width - 60)
         this.healthbar.width = width * (this.player.health / this.player.MAXHEALTH);
         if (this.damagebar.width < this.healthbar.width) {
             this.damagebar.width = this.healthbar.width;
         }
-        if (damage > 0) {
-            this.time.removeEvent(this.depleteBar);
-        }
-        this.depleteBar = this.time.addEvent({ 
+        this.time.removeEvent(this.depleteBar);
+        this.depleteBar = this.time.addEvent({
             delay: 15,
             callback: () => {
                 // Increase Health
-                this.damagebar.width -= 2;
+                this.damagebar.width -= 4;
                 // If health is too much, stop function
                 if (this.damagebar.width <= this.healthbar.width) {
                     this.damagebar.width = this.healthbar.width;
@@ -467,7 +467,7 @@ class Play extends Phaser.Scene {
                 };
             },
             loop: true,
-            startAt: 5
+            startAt: -500
         });
     }
 

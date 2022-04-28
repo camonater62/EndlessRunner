@@ -13,7 +13,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
         // Physics
         this.setMaxVelocity(speed)
-        this.ACCELERATION = speed*10;
+        this.ACCELERATION = speed*8;
         this.DRAG = speed*6;
         this.setDragX(this.DRAG);
         this.setDragY(this.DRAG);
@@ -109,7 +109,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
             callback: () => {
                 // Increase Health
                 this.health += this.regenRate;
-                this.scene.updateHealthBar(-this.regenRate);
+                this.scene.updateHealthBar();
                 // If health is too much, stop function
                 if (this.health >= this.MAXHEALTH) {
                     this.health = this.MAXHEALTH;
@@ -117,7 +117,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
                 };
             },
             loop: true,
-            startAt: -2500
+            startAt: -3500
         });
     }
 }
