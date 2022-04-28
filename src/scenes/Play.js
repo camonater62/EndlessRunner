@@ -89,8 +89,8 @@ class Play extends Phaser.Scene {
         this.anims.create({
             key: 'player-bullet',
             frames: this.anims.generateFrameNames('bullet', {
-                start: 3,
-                end: 5,
+                start: 6,
+                end: 8,
             }),
             frameRate: 12,
             repeat: -1
@@ -128,8 +128,9 @@ class Play extends Phaser.Scene {
         this.physics.add.overlap(this.player, this.bulletGroup, (player, bullet) => {
             if (bullet.team != 'player') {
                 bullet.remove = true;
-                player.hit(bullet);
-                this.screenshake(25, 1);
+                player.hit(bullet.damage);
+                this.updateHealthBar(bullet.damage);
+                this.screenshake(35, 1);
             }
         });
 
@@ -145,7 +146,8 @@ class Play extends Phaser.Scene {
             // Behaviour
             speed: 250,
             shootInterval: 1000000, // This enemy doesn't shoot, so irrelevant number
-            health: 1,
+            health: 2,
+            damage: 1,
             // Functions
             moveFunction: defaultMovement,
             fireFunction: defaultFire,
@@ -160,7 +162,8 @@ class Play extends Phaser.Scene {
             // Behavior
             speed: 80,
             shootInterval: 1000000,
-            health: 4,
+            health: 15,
+            damage: 7,
             // Functions
             moveFunction: (enemy) => {
             //    enemy.y += enemy.speed;
@@ -179,12 +182,13 @@ class Play extends Phaser.Scene {
             endFrame: 19,
             // Behaviour
             speed: 150,
-            shootInterval: 1000,
-            health: 2,
+            shootInterval: 1500,
+            health: 15,
+            damage: 3,
             moveFunction: defaultMovement,
             fireFunction: (enemy) => { 
                 // TODO: config
-                this.addBullet(enemy.x, enemy.y + (enemy.height * SCALE) + 8, 300, 'enemy');
+                this.addBullet(enemy.x, enemy.y + (enemy.height), 300, 'enemy');
             },
             deathFunction: defaultDeathCondition,
         }
@@ -197,14 +201,15 @@ class Play extends Phaser.Scene {
             // Behaviour
             speed: 150,
             shootInterval: 800,
-            health: 4,
+            health: 25,
+            damage: 4,
             moveFunction: (enemy, delta) => {
                 enemy.setVelocityY(enemy.speed);
                 enemy.setVelocityX(enemy.speed * sin(5 * enemy.time))
             },
             fireFunction: (enemy) => { 
-                this.addBullet(1 * enemy.width / 2 + enemy.x, enemy.y + (enemy.height * SCALE), 400, 'enemy');
-                this.addBullet(-1 * enemy.width / 2 + enemy.x, enemy.y + (enemy.height * SCALE), 400, 'enemy');
+                this.addBullet(1 * enemy.width*0.8 + enemy.x, enemy.y + (enemy.height * SCALE), 400, 'enemy');
+                this.addBullet(-1 * enemy.width*0.8 + enemy.x, enemy.y + (enemy.height * SCALE), 400, 'enemy');
             },
             deathFunction: defaultDeathCondition,
         }
@@ -218,7 +223,8 @@ class Play extends Phaser.Scene {
             // Behaviour
             speed: -750,
             shootInterval: 1000000, // doesn't shoot
-            health: 2,
+            health: 10,
+            damage: 8,
             moveFunction: (enemy) => {
                 enemy.setAccelerationY(enemy.speed);
             },
@@ -237,12 +243,12 @@ class Play extends Phaser.Scene {
             startAt: 5000
         });
         this.time.addEvent({ 
-            delay: 2700,
+            delay: 5400,
             callback: () => {
                 this.addEnemy(asteroidConfig, Math.random() * game.config.width);
             },
             loop: true,
-            startAt: 0
+            startAt: -2000
         })
         this.time.addEvent({
             delay: 1500,
@@ -270,6 +276,8 @@ class Play extends Phaser.Scene {
         });
 
         this.healthbar = this.add.tileSprite(30, 30, game.config.width - 60, 30, 'healthbar', 0).setOrigin(0,0);
+        this.damagebar = this.add.tileSprite(30, 30, game.config.width - 60, 30, 'healthbar', 0).setOrigin(0,0);
+        this.damagebar.setTintFill(0xffffff);
 
         this.shakeCount = 0;
         this.shakeIntensity = 0;
@@ -306,8 +314,8 @@ class Play extends Phaser.Scene {
                 this.bulletGroup.remove(bullet);
             }
         }, this);
-
-        this.healthbar.width = (this.game.config.width - 60) * (this.player.health / this.player.max_health);
+        // Set Z values to highest for healths
+        this.children.bringToTop(this.damagebar);
         this.children.bringToTop(this.healthbar);
 
         let cam = this.cameras.main;
@@ -418,27 +426,13 @@ class Play extends Phaser.Scene {
         this.physics.add.overlap(this.bulletGroup, this.enemyGroup[index], (bullet, enemy) => {
             if (bullet.team != 'enemy') {
                 bullet.remove = true;
-                enemy.health -= 1;
-                enemy.setTintFill(0xffffff);
-                this.clearTint = this.time.delayedCall(125, () => {
-                    enemy.clearTint();
-                }, null, this);
-                
+                enemy.hit(bullet.damage);
                 this.screenshake(10, 1);
-                let boom = this.add.sprite(enemy.x, enemy.y, 'healthbar').setOrigin(0.5,0.5);
-                boom.scale = SCALE*2;
-                boom.anims.play('explosion');
-                boom.on('animationComplete', () => {
-                    boom.alpha = 0;
-                    boom.destroy();
-                });
-                if (enemy.health <= 0) {
-                    enemy.explodinate();
-                };
             };
         });
         this.physics.add.overlap(this.player, this.enemyGroup[index], (player, enemy) => {
-            player.hit(enemy);
+            player.hit(enemy.damage);
+            this.updateHealthBar(enemy.damage);
             enemy.explodinate();
             this.screenshake(50, 1.5)
             let boom = this.add.sprite(enemy.x, enemy.y, 'healthbar').setOrigin(0.5,0.5);
@@ -448,6 +442,32 @@ class Play extends Phaser.Scene {
                 boom.alpha = 0;
                 boom.destroy();
             });
+        });
+    }
+
+    updateHealthBar(damage) {
+        console.log(damage);
+        let width = (this.game.config.width - 60)
+        this.healthbar.width = width * (this.player.health / this.player.MAXHEALTH);
+        if (this.damagebar.width < this.healthbar.width) {
+            this.damagebar.width = this.healthbar.width;
+        }
+        if (damage > 0) {
+            this.time.removeEvent(this.depleteBar);
+        }
+        this.depleteBar = this.time.addEvent({ 
+            delay: 15,
+            callback: () => {
+                // Increase Health
+                this.damagebar.width -= 2;
+                // If health is too much, stop function
+                if (this.damagebar.width <= this.healthbar.width) {
+                    this.damagebar.width = this.healthbar.width;
+                    this.time.removeEvent(this.depleteBar);
+                };
+            },
+            loop: true,
+            startAt: 5
         });
     }
 

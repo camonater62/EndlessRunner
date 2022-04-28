@@ -17,7 +17,7 @@ let animations;
 class Enemy extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y, 
         {
-            texture, startFrame, endFrame, speed, shootInterval, health,
+            texture, startFrame, endFrame, speed, shootInterval, health, damage,
             deathFunction=defaultDeathCondition, 
             moveFunction=defaultMovement,
             fireFunction=defaultFire
@@ -26,11 +26,12 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
         super(scene, x, y, texture, startFrame);
 
         this.scale = SCALE;
-
+        // Variables
         this.maxHealth = health;
         this.health = this.maxHealth;
         this.speed = speed;
         this.shootInterval = shootInterval;
+        this.damage = damage;
 
         this.deathFunction = deathFunction;
         this.moveFunction = moveFunction;
@@ -93,5 +94,27 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.clearTint();
 
         this.health = this.maxHealth;
+    }
+
+    hit(damage) {
+        this.health -= damage;
+        this.setTintFill(0xffffff);
+        this.scene.physics.pause();
+        this.scene.clearTint = this.scene.time.delayedCall(125, () => {
+            this.clearTint();
+        }, null, this);
+        this.scene.time.delayedCall(25, () => {
+            this.scene.physics.resume();
+        })
+        let boom = this.scene.add.sprite(this.x, this.y, 'healthbar').setOrigin(0.5,0.5);
+        boom.scale = SCALE*2;
+        boom.anims.play('explosion');
+        boom.on('animationComplete', () => {
+            boom.alpha = 0;
+            boom.destroy();
+        });
+        if (this.health <= 0) {
+            this.explodinate();
+        };
     }
 }

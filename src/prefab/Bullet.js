@@ -7,6 +7,7 @@ class Bullet extends Phaser.Physics.Arcade.Sprite {
         this.team = team;
         this.speed = speed;
         this.scale = SCALE*1.5;
+        this.damage = 5;
        
         this.updateAnimation();
         

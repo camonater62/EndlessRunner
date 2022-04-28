@@ -11,14 +11,17 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.scale = SCALE/2;
         //this.scale = 0.6; // Would like to avoid this
 
-
+        // Physics
         this.setMaxVelocity(speed)
         this.ACCELERATION = speed*10;
         this.DRAG = speed*6;
         this.setDragX(this.DRAG);
         this.setDragY(this.DRAG);
-        this.max_health = 20;
-        this.health = this.max_health;
+        // Variables
+        this.MAXHEALTH = 20;
+        this.health = this.MAXHEALTH;
+        this.baseRegen = 0.05;
+        this.regenRate = this.baseRegen;
 
         this.anims.create({
             key: 'animation',
@@ -91,16 +94,30 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.x = max(min(game.config.width - this.width / 2, this.x), -this.width / 2);
     }
 
-    hit(objectType) {
-        if (objectType instanceof Bullet) {
-            this.health -= 2;
-        }
-        else if (objectType instanceof Enemy) {
-            this.health -= 5;
-        }
+    hit(damage) {
+        this.health -= damage;
+        this.scene.time.removeEvent(this.heal, this.increaseHeal);
         this.setTintFill(0xffffff);
-        this.scene.clearTint = this.scene.time.delayedCall(250, () => {
+        this.scene.physics.pause();
+        this.scene.clearTint = this.scene.time.delayedCall(125, () => {
             this.clearTint();
+            this.scene.physics.resume();
         }, null, this);
+        // call to heal player
+        this.heal = this.scene.time.addEvent({
+            delay: 15,
+            callback: () => {
+                // Increase Health
+                this.health += this.regenRate;
+                this.scene.updateHealthBar(-this.regenRate);
+                // If health is too much, stop function
+                if (this.health >= this.MAXHEALTH) {
+                    this.health = this.MAXHEALTH;
+                    this.scene.time.removeEvent(this.heal);
+                };
+            },
+            loop: true,
+            startAt: -2500
+        });
     }
 }
