@@ -74,14 +74,6 @@ class Play extends Phaser.Scene {
     }
 
     create() {
-
-        this.ocean = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'ocean').setOrigin(0, 0);
-        this.ocean.alpha = 0.75;
-
-        // TODO: Draw Player on top
-        this.player = new Player(this, game.config.width / 2, 3 * game.config.height / 4, 'player', 0, 750).setOrigin(0, 0);
-        this.player.x -= this.player.width / 2;
-
         this.anims.create({
             key: 'explosion',
             frames: this.anims.generateFrameNames('explosion-sheet', {start: 0, end: 9}),
@@ -114,6 +106,26 @@ class Play extends Phaser.Scene {
         //     frameRate: 12,
         //     repeat: -1
         // });
+
+        // Draw Background
+        this.ocean = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'ocean').setOrigin(0, 0);
+        this.ocean.alpha = 0.75;
+
+        // Particle Manager
+        this.particles = this.make.particles({
+            key: 'bullet',
+            add: true,
+            emitters: [
+                // this.emitterConfig0,
+                // ... etc
+            ],
+            alpha: 1
+        });
+
+        // TODO: Draw Player on top
+        this.player = new Player(this, game.config.width / 2, 3 * game.config.height / 4, 'player', 0, 750).setOrigin(0, 0);
+        this.player.x -= this.player.width / 2;
+
 
         this.bulletGroup = this.physics.add.group({
             removeCallback: (bullet) => {
@@ -201,7 +213,7 @@ class Play extends Phaser.Scene {
             endFrame: 15,
             // Behaviour
             speed: 150,
-            shootInterval: 800,
+            shootInterval: 1000,
             health: 25,
             damage: 4,
             moveFunction: (enemy, delta) => {
@@ -209,8 +221,8 @@ class Play extends Phaser.Scene {
                 enemy.setVelocityX(enemy.speed * sin(5 * enemy.time))
             },
             fireFunction: (enemy) => { 
-                this.addBullet(1 * enemy.width*0.8 + enemy.x, enemy.y + (enemy.height * SCALE), 400, 'enemy');
-                this.addBullet(-1 * enemy.width*0.8 + enemy.x, enemy.y + (enemy.height * SCALE), 400, 'enemy');
+                this.addBullet(1 * enemy.width*0.9 + enemy.x, enemy.y + (enemy.height * SCALE), 400, 'enemy');
+                this.addBullet(-1 * enemy.width*0.9 + enemy.x, enemy.y + (enemy.height * SCALE), 400, 'enemy');
             },
             deathFunction: defaultDeathCondition,
         }
@@ -235,16 +247,16 @@ class Play extends Phaser.Scene {
         this.addEnemyPoolGroupPair(enemyYellowConfig);
         
         this.time.addEvent({
-            delay: 750,
+            delay: 2500,
             callback: () => {
                 // TODO: remove special stuff ; make universal
-                this.addEnemyWave(enemyRedConfig, 3, 250);
+                this.addEnemyWave(enemyRedConfig, 5, 250);
             }, 
             loop: true,
             startAt: 5000
         });
         this.time.addEvent({ 
-            delay: 5400,
+            delay: 20000,
             callback: () => {
                 this.addEnemy(asteroidConfig, Math.random() * game.config.width);
             },
@@ -270,12 +282,13 @@ class Play extends Phaser.Scene {
         this.time.addEvent({
             delay: 10000,
             callback: () => {
-                this.addEnemy(enemyYellowConfig, Math.random() * game.config.width);
+                this.addEnemy(enemyYellowConfig, this.player.x);
             }, 
             loop: true,
             startAt: -30000
         });
 
+        // add health bar images
         this.healthbar = this.add.tileSprite(30, 30, game.config.width - 60, 30, 'healthbar', 0).setOrigin(0,0);
         this.damagebar = this.add.tileSprite(30, 30, game.config.width - 60, 30, 'healthbar', 0).setOrigin(0,0);
         this.damagebar.setTintFill(0xffffff);
@@ -283,6 +296,40 @@ class Play extends Phaser.Scene {
 
         this.shakeCount = 0;
         this.shakeIntensity = 0;
+
+        this.playerJetStream = this.particles.createEmitter({
+            // x: {min: this.player.x - 5, max: this.player.x + 5},
+            // y: {min: this.player.y - 5, max:this.player.y + 5},
+            x: this.player.x,
+            y: this.player.y,
+            follow: this.player,
+            followOffset: {
+                x: this.player.width/2,
+                y: this.player.height,
+            },
+            scaleY: 3,
+            // **emitter**
+            name: 'Emitter',
+            on: true,          // set false to stop emitter
+            active: true,      // set false to pause emitter and particles
+            frequency: 1,      // -1 for exploding emitter
+            quantity: {min: 40, max: 60},       // { min, max }
+            maxParticles: 0,
+            reserve: 15,
+            rotate: this.player.velocityX,           // I want to get it to rotate with the player direction
+            timeScale: 1,
+            // repeating values
+            // delay: {min: 5, max: 5},
+            lifespan: {min: 50, max: 80},
+            // direction
+            // radial: true,
+            angle: {min: 75, max: 105},
+            // velocity
+            speed: {min: 50, max: 80},
+            // sprite sheet frames : animation
+            frames: 6,
+            cycle: true
+        });
     }
 
     update(time, delta) {
@@ -389,19 +436,21 @@ class Play extends Phaser.Scene {
     }
 
     addEnemyWave(enemyConfig, amount, wait) {
-        let baseX = (Math.random() * this.game.config.width)
-        if (baseX < this.game.config.width * 0.25) {
-            baseX = this.game.config.width * 0.25
-        }
-        else if (baseX > this.game.config.width * .75) {
-            baseX = this.game.config.width * .75
-        }
+        // let baseX = (Math.random() * this.game.config.width)
+        // if (baseX < this.game.config.width * 0.25) {
+        //     baseX = this.game.config.width * 0.25
+        // }
+        // else if (baseX > this.game.config.width * .75) {
+        //     baseX = this.game.config.width * .75
+        // }
+        let baseX = this.game.config.width;
         this.time.addEvent({
             delay: wait,
             callback: () => {
                 // TODO: remove special stuff ; make universal
-                let e = this.addEnemy(enemyConfig, baseX * sin(5 * this.gameTime));
-                e.time = Math.random() * this.gameTime;
+                this.addEnemy(enemyConfig, baseX * Math.random());
+                // let e = this.addEnemy(enemyConfig, baseX * sin(5 * this.gameTime));
+                // e.time = Math.random() * this.gameTime;
             }, 
             repeat: amount,
             startAt: 0
