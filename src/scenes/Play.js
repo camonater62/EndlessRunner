@@ -1,3 +1,9 @@
+// flash x3
+// shake on enemy death not hit
+// more shake for player damage
+// increase speed over time
+// laser powerup
+
 class Play extends Phaser.Scene {
     constructor() {
         super("playScene");
@@ -153,6 +159,7 @@ class Play extends Phaser.Scene {
             moveFunction: defaultMovement,
             fireFunction: defaultFire,
             deathFunction: defaultDeathCondition,
+            score: 10,
         };
         this.addEnemyPoolGroupPair(enemyRedConfig);
         const asteroidConfig = {
@@ -174,6 +181,7 @@ class Play extends Phaser.Scene {
             },
             fireFunction: defaultFire,
             deathFunction: defaultDeathCondition,
+            score: 25,
         };
         this.addEnemyPoolGroupPair(asteroidConfig);
         const enemyGreenConfig = {
@@ -192,6 +200,7 @@ class Play extends Phaser.Scene {
                 this.addBullet(enemy.x, enemy.y + (enemy.height), 300, 'enemy');
             },
             deathFunction: defaultDeathCondition,
+            score: 40,
         }
         this.addEnemyPoolGroupPair(enemyGreenConfig);
         const enemyBlueConfig = {
@@ -213,6 +222,7 @@ class Play extends Phaser.Scene {
                 this.addBullet(-1 * enemy.width*0.8 + enemy.x, enemy.y + (enemy.height * SCALE), 400, 'enemy');
             },
             deathFunction: defaultDeathCondition,
+            score: 100,
         }
         this.addEnemyPoolGroupPair(enemyBlueConfig);
         const enemyYellowConfig = {
@@ -231,6 +241,7 @@ class Play extends Phaser.Scene {
             },
             fireFunction: defaultFire,
             deathFunction: defaultDeathCondition,
+            score: 500,
         }
         this.addEnemyPoolGroupPair(enemyYellowConfig);
         
@@ -283,6 +294,22 @@ class Play extends Phaser.Scene {
 
         this.shakeCount = 0;
         this.shakeIntensity = 0;
+
+        this.score = 0;
+        let scoreConfig = {
+            fontFamily: 'Courier', // TODO better font?
+            fontSize: '28px',
+            backgroundColor: '#000',
+            color: '#FFF',
+            align: 'center',
+            padding: {
+                top: 5,
+                bottom: 5,
+            },
+            fixedWidth: 100,
+        };
+        this.scoreDisplay = this.add.text(10, 10, this.score, scoreConfig);
+        this.highScoreDisplay = this.add.text(game.config.width - 10 - scoreConfig.fixedWidth, 10, highScore, scoreConfig);
     }
 
     update(time, delta) {
@@ -293,6 +320,10 @@ class Play extends Phaser.Scene {
 
         this.player.update(delta);
         if (this.player.health <= 0) {
+            if (this.score > highScore) {
+                highScore = this.score;
+                localStorage.setItem('highScore', highScore);
+            }
             this.scene.start('menuScene');
         }
 
@@ -335,6 +366,8 @@ class Play extends Phaser.Scene {
         const MAXDIST = 20;
         cam.x = max(min(cam.x, MAXDIST), -MAXDIST);
         cam.y = max(min(cam.y, MAXDIST), -MAXDIST);
+
+        this.scoreDisplay.text = this.score;
     }
 
     // TODO: config
@@ -430,14 +463,17 @@ class Play extends Phaser.Scene {
             if (bullet.team != 'enemy') {
                 bullet.remove = true;
                 enemy.hit(bullet.damage);
-                this.screenshake(10, 1);
+            //  playtesters did not like shake on every hit
+            //  --> make explosion only
+            //    this.screenshake(10, 1);
             };
         });
         this.physics.add.overlap(this.player, this.enemyGroup[index], (player, enemy) => {
             player.hit(enemy.damage);
             this.updateHealthBar();
             enemy.explodinate();
-            this.screenshake(50, 1.5)
+            // make screenshake relative to damage dealt
+            this.screenshake(enemy.maxHealth, 1.5); 
             let boom = this.add.sprite(enemy.x, enemy.y, 'healthbar').setOrigin(0.5,0.5);
             boom.scale = SCALE*2;
             boom.anims.play('explosion');
@@ -481,7 +517,7 @@ class Play extends Phaser.Scene {
     }
 
     screenshake(intensity, count) {
-        this.shakeCount = max(this.shakeCount, count);
-        this.shakeIntensity = max(this.shakeIntensity, intensity);
+        this.shakeCount += count;
+        this.shakeIntensity += intensity;
     }
 }
