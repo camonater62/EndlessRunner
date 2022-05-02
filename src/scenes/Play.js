@@ -90,7 +90,7 @@ class Play extends Phaser.Scene {
         // this.load.image('clusters', './assets/Mid_Stars.png');
         // this.load.image('galaxy', './assets/Galaxxy.png');
         this.load.image('healthbar', './assets/health.png');
-        this.load.image('healthbar-outline', './assets/helfbah.png');
+        this.load.image('healthbar-outline', './assets/health-bar-outline.png');
 
         this.load.audio('music', './assets/CCMusic.mp3');
     }
@@ -344,10 +344,10 @@ class Play extends Phaser.Scene {
         });
 
         // add health bar images
-        this.healthbar = this.add.tileSprite(game.config.width*0.15, 30, game.config.width*0.7, 30, 'healthbar', 0).setOrigin(0,0);
-        this.damagebar = this.add.tileSprite(game.config.width*0.15, 30, game.config.width*0.7, 30, 'healthbar', 0).setOrigin(0,0);
+        this.healthbar = this.add.tileSprite(game.config.width*0.2, 30, game.config.width*0.6, 30, 'healthbar', 0).setOrigin(0,0);
+        this.damagebar = this.add.tileSprite(game.config.width*0.2, 30, game.config.width*0.6, 30, 'healthbar', 0).setOrigin(0,0);
         this.damagebar.setTintFill(0xffffff);
-        this.healthOutline = this.add.image(30, 30, 'healthbar-outline').setOrigin(0, 0).setScale(SCALE);
+        this.healthOutline = this.add.image(game.config.width*0.2, 30, 'healthbar-outline').setOrigin(0, 0).setScale(SCALE*2);
         this.destroyedBarGroup = this.physics.add.group({ 
             gravityY: 1500,
             // accelerationY: 500,
@@ -603,11 +603,11 @@ class Play extends Phaser.Scene {
     }
 
     updateHealthBar() {
-        let width = (this.game.config.width*0.7)
+        let width = (this.game.config.width*0.6)
         let newWidth = width * (this.player.health / this.player.MAXHEALTH);
         let damage = -(newWidth - this.healthbar.width);
         if (newWidth < this.healthbar.width) {
-            let destroyedBar = this.add.tileSprite(game.config.width*0.15 + newWidth, 30, 
+            let destroyedBar = this.add.tileSprite(game.config.width*0.2 + newWidth, 30, 
                 damage, 30, 'healthbar', 0).setOrigin(0.5,0.5);
             destroyedBar.x += destroyedBar.width/2;
             destroyedBar.y += destroyedBar.height/2;
