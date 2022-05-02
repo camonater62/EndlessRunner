@@ -75,6 +75,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
             delay: 175,         // 0 for laser!!
             callback: () => {
                 scene.addBullet(this.x + this.width / 2, this.y - 25, -1.5 * speed, 'player');
+                this.scene.laser.play();
             },
             loop: true,
             paused: true,
@@ -124,7 +125,6 @@ class Player extends Phaser.Physics.Arcade.Sprite {
                 this.shootTimer.paused = false;
                 this.shootTimer.callback();
                 this.shootTimer.elapsed = 0;
-                this.scene.laser.play();
             }
         }
         if (keySpace.isUp) {
