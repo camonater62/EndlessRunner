@@ -147,6 +147,14 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.scene.particleStop = this.scene.time.delayedCall(25, () => {
             this.scene.playerHit.stop();
         });
+
+        let boom = this.scene.add.sprite(this.x + this.width/2, this.y + this.height/2, 'healthbar').setOrigin(0.5,0.5);
+        boom.scale = SCALE*1.5;
+        boom.anims.play('super-explosion');
+        boom.on('animationcomplete', () => {
+            boom.alpha = 0;
+            boom.destroy();
+        });
         this.scene.clearTint = this.scene.time.delayedCall(125 +damage*5, () => {
             this.clearTint();
             this.scene.physics.resume();

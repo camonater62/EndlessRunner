@@ -51,11 +51,11 @@ class Play extends Phaser.Scene {
             startFrame: 0,
             endFrame: 0
         });
-        this.load.spritesheet('explosion-sheet', './assets/explosion.png', {
+        this.load.spritesheet('explosion-sheet', './assets/bullethit-Sheet.png', {
             frameWidth: 32,
             frameHeight: 32,
             startFrame: 0,
-            endFrame: 9
+            endFrame: 2
         });
         this.load.spritesheet('superExplosion-sheet', './assets/explosionado-Sheet.png', {
             frameWidth: 32,
@@ -109,8 +109,8 @@ class Play extends Phaser.Scene {
 
         this.anims.create({
             key: 'explosion',
-            frames: this.anims.generateFrameNames('explosion-sheet', {start: 0, end: 9}),
-            frameRate: 30
+            frames: this.anims.generateFrameNames('explosion-sheet', {start: 0, end: 2}),
+            frameRate: 12
         });
         this.anims.create({ 
             key: 'super-explosion',
@@ -592,13 +592,6 @@ class Play extends Phaser.Scene {
             this.updateHealthBar();
             enemy.explodinate();
             this.screenshake(50, 1.5)
-            let boom = this.add.sprite(enemy.x, enemy.y, 'healthbar').setOrigin(0.5,0.5);
-            boom.scale = SCALE*2;
-            boom.anims.play('explosion');
-            boom.on('animationComplete', () => {
-                boom.alpha = 0;
-                boom.destroy();
-            });
         });
     }
 
