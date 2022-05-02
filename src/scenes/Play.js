@@ -4,6 +4,10 @@ class Play extends Phaser.Scene {
     }
 
     preload() {
+        this.load.audio('hit', './assets/CCHit.wav');
+        this.load.audio('laser', './assets/CCLaser1.wav');
+        this.load.audio('explode', './assets/CCExplode1.wav');
+
         keyDOWN = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
         keyUP = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
         keyLEFT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
@@ -87,9 +91,26 @@ class Play extends Phaser.Scene {
         // this.load.image('galaxy', './assets/Galaxxy.png');
         this.load.image('healthbar', './assets/health.png');
         this.load.image('healthbar-outline', './assets/helfbah.png');
+
+        this.load.audio('music', './assets/CCMusic.mp3');
     }
 
     create() {
+        this.music = this.sound.add('music');
+        this.music.setLoop(true);
+        this.music.play();
+
+        this.laser = this.sound.add('laser');
+        this.hit = this.sound.add('hit');
+        this.explode = this.sound.add('explode');
+        
+        this.ocean = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'ocean').setOrigin(0, 0);
+        this.ocean.alpha = 0.75;
+
+        // TODO: Draw Player on top
+        this.player = new Player(this, game.config.width / 2, 3 * game.config.height / 4, 'player', 0, 750).setOrigin(0, 0);
+        this.player.x -= this.player.width / 2;
+
         this.anims.create({
             key: 'explosion',
             frames: this.anims.generateFrameNames('explosion-sheet', {start: 0, end: 9}),
@@ -391,6 +412,11 @@ class Play extends Phaser.Scene {
 
         this.player.update(delta);
         if (this.player.health <= 0) {
+            if (this.score > highScore) {
+                highScore = this.score;
+                localStorage.setItem('highScore', highScore);
+            }
+            this.music.stop();
             this.scene.start('menuScene');
         }
 

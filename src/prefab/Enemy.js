@@ -146,6 +146,8 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
             this.scene.enemyExplodinate.stop();
         });
         boom.on('animationcomplete', () => {
+       
+        this.scene.explode.play();
             boom.alpha = 0;
             boom.destroy();
         });
@@ -164,6 +166,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
     }
 
     hit(damage) {
+        this.scene.laser.play();
         this.health -= damage;
         this.setTintFill(0xffffff);
         this.scene.physics.pause();
