@@ -8,6 +8,7 @@ class Play extends Phaser.Scene {
         this.load.audio('laser', './assets/CCLaser1.wav');
         this.load.audio('explode', './assets/CCExplode1.wav');
         this.load.audio('playerdamage', './assets/CCDamage.wav');
+        this.load.audio('gameover', './assets/CCGameover.wav');
 
         keyDOWN = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
         keyUP = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
@@ -105,6 +106,7 @@ class Play extends Phaser.Scene {
         this.hit = this.sound.add('hit');
         this.explode = this.sound.add('explode');
         this.playerdamage = this.sound.add('playerdamage');
+        this.gameover = this.sound.add('gameover');
         
         this.ocean = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'ocean').setOrigin(0, 0);
         this.ocean.alpha = 0.75;
@@ -439,6 +441,7 @@ class Play extends Phaser.Scene {
                 localStorage.setItem('highScore', highScore);
             }
             this.music.stop();
+            this.gameover.play();
             this.scene.start('menuScene');
         }
 
