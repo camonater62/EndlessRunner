@@ -22,6 +22,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.health = this.MAXHEALTH;
         this.baseRegen = 0.05;
         this.regenRate = this.baseRegen;
+        this.particleBase = 25
 
         this.anims.create({
             key: 'animation',
@@ -29,9 +30,49 @@ class Player extends Phaser.Physics.Arcade.Sprite {
             frameRate: 12
         });
 
+        this.scene.playerHit = this.scene.particles.createEmitter({
+            x: this.x,
+            y: this.y,
+            // follow: this,
+            // followOffset: {
+            //     x: this.width/2,
+            //     y: this.height/2,
+            // },
+            scale: this.scale,
+            // **emitter**
+            name: 'Kachow',
+            on: false,          // set false to stop emitter
+            active: true,      // set false to pause emitter and particles
+            frequency: 1,      // -1 for exploding emitter
+            quantity: {min: 25, max: 35},       // { min, max }
+            maxParticles: 0,
+            reserve: 15,
+            // rotate: this.player.velocityX,           // I want to get it to rotate with the player direction
+            timeScale: 1,
+            // repeating values
+            delay: {min: 25, max: 55},
+            lifespan: {min: 115, max: 275},
+            // directionx
+            // radial: true,
+            angle: {min: 0, max: 360},
+            // velocity
+            speed: {min: 125, max: 300},
+            acceleration: -500,
+            // sprite sheet frames : animation
+            frame: 7,
+            alpha: 1,
+            cycle: true
+        });
+
+        // this.shootTimer = scene.time.addEvent({
+        //     delay: shootInterval,
+        //     callback: () => {fireFunction(this);},
+        //     loop: true,
+        // });
+
         // Add to config
         this.shootTimer = scene.time.addEvent({
-            delay: 200,         // 0 for laser!!
+            delay: 175,         // 0 for laser!!
             callback: () => {
                 scene.addBullet(this.x + this.width / 2, this.y - 25, -1.5 * speed, 'player');
             },
@@ -99,8 +140,14 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.health -= damage;
         this.scene.time.removeEvent(this.heal, this.increaseHeal);
         this.setTintFill(0xffffff);
+        this.scene.playerHit.setPosition(this.x + this.width/2, this.y + this.height/2)
+        this.scene.playerHit.setQuantity({min:65, max: 75})//this.particleBase*(damage+10)
+        this.scene.playerHit.start();
         this.scene.physics.pause();
-        this.scene.clearTint = this.scene.time.delayedCall(125, () => {
+        this.scene.particleStop = this.scene.time.delayedCall(25, () => {
+            this.scene.playerHit.stop();
+        });
+        this.scene.clearTint = this.scene.time.delayedCall(125 +damage*5, () => {
             this.clearTint();
             this.scene.physics.resume();
         }, null, this);

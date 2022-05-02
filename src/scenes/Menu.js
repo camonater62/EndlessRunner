@@ -6,13 +6,14 @@ class Menu extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('background', './assets/CCMenu.png');
+        this.load.image('menu_background', './assets/CCMenu.png');
     }
 
     create() {
 
         this.keyEnter = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
        
+
         let background = this.add.image(0, game.config.height / 2, 'background').setOrigin(0, 0.5);
         
         background.displayWidth = game.config.width;
