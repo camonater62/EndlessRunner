@@ -137,6 +137,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     }
 
     hit(damage) {
+        this.scene.playerdamage.play();
         this.health -= damage;
         this.scene.time.removeEvent(this.heal, this.increaseHeal);
         this.setTintFill(0xffffff);
