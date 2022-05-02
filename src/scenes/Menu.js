@@ -12,9 +12,8 @@ class Menu extends Phaser.Scene {
     create() {
 
         this.keyEnter = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
-       
 
-        let background = this.add.image(0, game.config.height / 2, 'background').setOrigin(0, 0.5);
+        let background = this.add.image(0, game.config.height / 2, 'menu_background').setOrigin(0, 0.5);
         
         background.displayWidth = game.config.width;
         background.displayHeight = background.displayWidth * background.height / background.width;

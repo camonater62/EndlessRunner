@@ -107,10 +107,6 @@ class Play extends Phaser.Scene {
         this.ocean = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'ocean').setOrigin(0, 0);
         this.ocean.alpha = 0.75;
 
-        // TODO: Draw Player on top
-        this.player = new Player(this, game.config.width / 2, 3 * game.config.height / 4, 'player', 0, 750).setOrigin(0, 0);
-        this.player.x -= this.player.width / 2;
-
         this.anims.create({
             key: 'explosion',
             frames: this.anims.generateFrameNames('explosion-sheet', {start: 0, end: 9}),
