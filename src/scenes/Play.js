@@ -10,6 +10,8 @@ class Play extends Phaser.Scene {
     }
 
     preload() {
+        this.load.audio('music', './assets/CCMusic.mp3');
+
         keyDOWN = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
         keyUP = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
         keyLEFT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
@@ -80,7 +82,10 @@ class Play extends Phaser.Scene {
     }
 
     create() {
-
+        var music = this.sound.add('music');
+        music.setLoop(true);
+        music.play();
+        
         this.ocean = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'ocean').setOrigin(0, 0);
         this.ocean.alpha = 0.75;
 
@@ -324,6 +329,7 @@ class Play extends Phaser.Scene {
                 highScore = this.score;
                 localStorage.setItem('highScore', highScore);
             }
+            this.sound.get('music').stop();
             this.scene.start('menuScene');
         }
 

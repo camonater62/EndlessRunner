@@ -7,17 +7,16 @@ class Menu extends Phaser.Scene {
 
     preload() {
         this.load.image('background', './assets/CCMenu.png');
+        //this.load.audio('music', './assets/CCMusic.mp3');
     }
 
     create() {
+
         this.keyEnter = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
        
         let background = this.add.image(game.config.width/65, game.config.height/10, 'background').setOrigin(0, 0);
         background.displayWidth = game.config.width;
-        //background.displayHeight = game.config.height;
         
-        //this.add.image(game.config.width/65, game.config.height/10, 'background').setOrigin(0, 0);
-    
         let ratio = game.config.width / game.config.height;
         this.scale.displaySize.setAspectRatio( ratio );
         this.scale.refresh();
