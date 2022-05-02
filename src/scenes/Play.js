@@ -155,7 +155,6 @@ class Play extends Phaser.Scene {
         this.cluster01.alpha = 0.4;
         this.cluster02.alpha = 0.6;
         this.cluster03.alpha = 0.2;
-        [this.cluster01, this.cluster02, this.cluster03].alpha = 0.5;
         // add sidebars
         this.background = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'background').setOrigin(0, 0);
         this.blobs = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'blobs').setOrigin(0, 0);
