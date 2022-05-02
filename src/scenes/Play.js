@@ -70,6 +70,10 @@ class Play extends Phaser.Scene {
         
         this.load.image('ocean', './assets/ocean.png');
         this.load.image('background', './assets/Background.png');
+        this.load.image('foreground', './assets/Foreground.png');
+        this.load.image('void', './assets/Void.png');
+        this.load.image('clusters', './assets/Mid_Stars.png');
+        this.load.image('galaxy', './assets/Galaxxy.png');
         this.load.image('healthbar', './assets/health.png');
         this.load.image('healthbar-outline', './assets/helfbah.png');
     }
@@ -114,9 +118,11 @@ class Play extends Phaser.Scene {
         // });
 
         // Draw Background
+        this.void = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'void').setOrigin(0, 0);
+        this.clusters = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'clusters').setOrigin(0, 0);
         this.background = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'background').setOrigin(0, 0);
-        this.ocean = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'ocean').setOrigin(0, 0);
-        this.ocean.alpha = 0;
+        // this.galaxy = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'galaxy').setOrigin(0, 0);
+        // this.foreground = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'foreground').setOrigin(0, 0);
 
         // Particle Manager
         this.particles = this.make.particles({
@@ -352,7 +358,10 @@ class Play extends Phaser.Scene {
         delta /= 1000; // ms -> s
 
         // Update background
-        this.ocean.tilePositionY -= delta * 200;
+        this.background.tilePositionY -= delta * 150;
+        // this.foreground.tilePositionY -= delta * 200;
+        this.clusters.tilePositionY -= delta * 100;
+        // this.galaxy.tilePositionY -= delta* 50;
 
         this.player.update(delta);
         if (this.player.health <= 0) {
