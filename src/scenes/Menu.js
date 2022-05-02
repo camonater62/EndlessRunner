@@ -7,7 +7,6 @@ class Menu extends Phaser.Scene {
 
     preload() {
         this.load.image('background', './assets/CCMenu.png');
-        //this.load.audio('music', './assets/CCMusic.mp3');
     }
 
     create() {
@@ -25,6 +24,7 @@ class Menu extends Phaser.Scene {
     }
 
     update() {
+
         if (this.keyEnter.isDown) {
             this.scene.start('playScene');
         } 

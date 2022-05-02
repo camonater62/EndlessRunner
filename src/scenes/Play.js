@@ -10,7 +10,7 @@ class Play extends Phaser.Scene {
     }
 
     preload() {
-        
+        this.load.audio('hit', './assets/CCHit.wav');
 
         keyDOWN = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
         keyUP = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
