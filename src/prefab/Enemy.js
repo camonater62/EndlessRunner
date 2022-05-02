@@ -81,6 +81,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
         let boom = this.scene.add.sprite(this.x, this.y, 'healthbar').setOrigin(0.5,0.5);
         boom.scale = SCALE*2;
         boom.anims.play('explosion');
+        this.scene.explode.play();
         boom.on('animationComplete', () => {
             boom.alpha = 0;
             boom.destroy();
@@ -100,6 +101,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
     }
 
     hit(damage) {
+        this.scene.laser.play();
         this.health -= damage;
         this.setTintFill(0xffffff);
         this.scene.physics.pause();

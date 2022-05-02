@@ -11,6 +11,8 @@ class Play extends Phaser.Scene {
 
     preload() {
         this.load.audio('hit', './assets/CCHit.wav');
+        this.load.audio('laser', './assets/CCLaser1.wav');
+        this.load.audio('explode', './assets/CCExplode1.wav');
 
         keyDOWN = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
         keyUP = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
@@ -87,6 +89,10 @@ class Play extends Phaser.Scene {
         this.music = this.sound.add('music');
         this.music.setLoop(true);
         this.music.play();
+
+        this.laser = this.sound.add('laser');
+        this.hit = this.sound.add('hit');
+        this.explode = this.sound.add('explode');
         
         this.ocean = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'ocean').setOrigin(0, 0);
         this.ocean.alpha = 0.75;

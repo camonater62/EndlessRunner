@@ -83,6 +83,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
                 this.shootTimer.paused = false;
                 this.shootTimer.callback();
                 this.shootTimer.elapsed = 0;
+                this.scene.laser.play();
             }
         }
         if (keySpace.isUp) {
