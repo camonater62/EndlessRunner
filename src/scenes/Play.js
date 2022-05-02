@@ -90,7 +90,7 @@ class Play extends Phaser.Scene {
         // this.load.image('clusters', './assets/Mid_Stars.png');
         // this.load.image('galaxy', './assets/Galaxxy.png');
         this.load.image('healthbar', './assets/health.png');
-        this.load.image('healthbar-outline', './assets/helfbah.png');
+        this.load.image('healthbar-outline', './assets/health-bar-outline.png');
 
         this.load.audio('music', './assets/CCMusic.mp3');
     }
@@ -155,7 +155,6 @@ class Play extends Phaser.Scene {
         this.cluster01.alpha = 0.4;
         this.cluster02.alpha = 0.6;
         this.cluster03.alpha = 0.2;
-        [this.cluster01, this.cluster02, this.cluster03].alpha = 0.5;
         // add sidebars
         this.background = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'background').setOrigin(0, 0);
         this.blobs = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'blobs').setOrigin(0, 0);
@@ -212,6 +211,7 @@ class Play extends Phaser.Scene {
             shootInterval: 1000000, // This enemy doesn't shoot, so irrelevant number
             health: 5,
             damage: 1,
+            score: 10,
             // Functions
             moveFunction: defaultMovement,
             fireFunction: defaultFire,
@@ -228,6 +228,7 @@ class Play extends Phaser.Scene {
             shootInterval: 1000000,
             health: 15,
             damage: 7,
+            score: 20,
             // Functions
             moveFunction: (enemy) => {
             //    enemy.y += enemy.speed;
@@ -249,6 +250,7 @@ class Play extends Phaser.Scene {
             shootInterval: 1500,
             health: 15,
             damage: 3,
+            score: 40,
             moveFunction: defaultMovement,
             fireFunction: (enemy) => { 
                 // TODO: config
@@ -267,6 +269,7 @@ class Play extends Phaser.Scene {
             shootInterval: 1000,
             health: 25,
             damage: 4,
+            score: 150,
             moveFunction: (enemy, delta) => {
                 enemy.setVelocityY(enemy.speed);
                 enemy.setVelocityX(enemy.speed * sin(5 * enemy.time))
@@ -289,6 +292,7 @@ class Play extends Phaser.Scene {
             shootInterval: 1000000, // doesn't shoot
             health: 10,
             damage: 8,
+            score: 500,
             moveFunction: (enemy) => {
                 enemy.setAccelerationY(enemy.speed);
             },
@@ -340,10 +344,10 @@ class Play extends Phaser.Scene {
         });
 
         // add health bar images
-        this.healthbar = this.add.tileSprite(30, 30, game.config.width - 60, 30, 'healthbar', 0).setOrigin(0,0);
-        this.damagebar = this.add.tileSprite(30, 30, game.config.width - 60, 30, 'healthbar', 0).setOrigin(0,0);
+        this.healthbar = this.add.tileSprite(game.config.width*0.2, 30, game.config.width*0.6, 30, 'healthbar', 0).setOrigin(0,0);
+        this.damagebar = this.add.tileSprite(game.config.width*0.2, 30, game.config.width*0.6, 30, 'healthbar', 0).setOrigin(0,0);
         this.damagebar.setTintFill(0xffffff);
-        this.healthOutline = this.add.image(30, 30, 'healthbar-outline').setOrigin(0, 0).setScale(SCALE);
+        this.healthOutline = this.add.image(game.config.width*0.2, 30, 'healthbar-outline').setOrigin(0, 0).setScale(SCALE*2);
         this.destroyedBarGroup = this.physics.add.group({ 
             gravityY: 1500,
             // accelerationY: 500,
@@ -352,7 +356,7 @@ class Play extends Phaser.Scene {
             // dragX: 2000
             angularVelocity: 2500,
         });
-
+        
         this.shakeCount = 0;
         this.shakeIntensity = 0;
 
@@ -389,6 +393,22 @@ class Play extends Phaser.Scene {
             frames: 6,
             cycle: true
         });
+
+        this.score = 0;
+        let scoreConfig = {
+            fontFamily: 'Courier', // TODO better font?
+            fontSize: '28px',
+            backgroundColor: '#000',
+            color: '#FFF',
+            align: 'center',
+            padding: {
+                top: 5,
+                bottom: 5,
+            },
+            fixedWidth: 100,
+        };
+        this.scoreDisplay = this.add.text(10, 10, this.score, scoreConfig);
+        this.highScoreDisplay = this.add.text(game.config.width - 10 - scoreConfig.fixedWidth, 10, highScore, scoreConfig);
     }
 
     update(time, delta) {
@@ -447,6 +467,9 @@ class Play extends Phaser.Scene {
             this.children.bringToTop(bar);
         });
         this.children.bringToTop(this.healthOutline);
+        // this.children.bringToTop(scoreDisplay);              // doesn't work for some reason
+        // this.children.bringToTop(highScoreDisplay);
+
 
         let cam = this.cameras.main;
         if (this.shakeCount > 0) {
@@ -462,6 +485,8 @@ class Play extends Phaser.Scene {
         const MAXDIST = 20;
         cam.x = max(min(cam.x, MAXDIST), -MAXDIST);
         cam.y = max(min(cam.y, MAXDIST), -MAXDIST);
+        
+        this.scoreDisplay.text = this.score;
     }
 
     // TODO: config
@@ -578,11 +603,11 @@ class Play extends Phaser.Scene {
     }
 
     updateHealthBar() {
-        let width = (this.game.config.width - 60)
+        let width = (this.game.config.width*0.6)
         let newWidth = width * (this.player.health / this.player.MAXHEALTH);
         let damage = -(newWidth - this.healthbar.width);
         if (newWidth < this.healthbar.width) {
-            let destroyedBar = this.add.tileSprite(30 + newWidth, 30, 
+            let destroyedBar = this.add.tileSprite(game.config.width*0.2 + newWidth, 30, 
                 damage, 30, 'healthbar', 0).setOrigin(0.5,0.5);
             destroyedBar.x += destroyedBar.width/2;
             destroyedBar.y += destroyedBar.height/2;
