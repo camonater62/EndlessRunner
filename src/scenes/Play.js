@@ -107,10 +107,6 @@ class Play extends Phaser.Scene {
         this.ocean = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'ocean').setOrigin(0, 0);
         this.ocean.alpha = 0.75;
 
-        // TODO: Draw Player on top
-        this.player = new Player(this, game.config.width / 2, 3 * game.config.height / 4, 'player', 0, 750).setOrigin(0, 0);
-        this.player.x -= this.player.width / 2;
-
         this.anims.create({
             key: 'explosion',
             frames: this.anims.generateFrameNames('explosion-sheet', {start: 0, end: 9}),
@@ -156,6 +152,10 @@ class Play extends Phaser.Scene {
         this.cluster01 = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'cluster01').setOrigin(0, 0);
         this.cluster02 = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'cluster02').setOrigin(0, 0);
         this.cluster03 = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'cluster03').setOrigin(0, 0);
+        this.cluster01.alpha = 0.4;
+        this.cluster02.alpha = 0.6;
+        this.cluster03.alpha = 0.2;
+        [this.cluster01, this.cluster02, this.cluster03].alpha = 0.5;
         // add sidebars
         this.background = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'background').setOrigin(0, 0);
         this.blobs = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'blobs').setOrigin(0, 0);
