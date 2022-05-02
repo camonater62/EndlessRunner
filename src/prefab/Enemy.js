@@ -54,7 +54,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
             repeat: -1
         });
 
-        this.scene.enemyHit = this.scene.particles.createEmitter({
+        this.enemyHit = this.scene.particles.createEmitter({
             x: this.x,
             y: this.y,
             scale: 1,
@@ -170,15 +170,15 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.health -= damage;
         this.setTintFill(0xffffff);
         this.scene.physics.pause();
-        this.scene.enemyHit.setPosition(this.x, this.y + this.height*0.8);
-        this.scene.enemyHit.start();
+        this.enemyHit.setPosition(this.x, this.y + this.height*0.8);
+        this.enemyHit.start();
         this.scene.clearTint = this.scene.time.delayedCall(125, () => {
             this.clearTint();
-            this.scene.enemyHit.stop();
+            this.enemyHit.stop();
         }, null, this);
         this.scene.time.delayedCall(25, () => {
             this.scene.physics.resume();
-            this.scene.enemyHit.stop();
+            this.enemyHit.stop();
         })
         let boom = this.scene.add.sprite(this.x, this.y, 'healthbar').setOrigin(0.5,0.5);
         boom.scale = SCALE*2;

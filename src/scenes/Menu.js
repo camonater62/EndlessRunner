@@ -24,7 +24,7 @@ class Menu extends Phaser.Scene {
             frameRate: 15, // what was this?
             loop: true,
             yoyo: true,
-            repeat: -1
+            repeat: -1,
         });
 
         let background = this.add.sprite(0, game.config.height / 2, 'menu', 0).setOrigin(0, 0.5);
