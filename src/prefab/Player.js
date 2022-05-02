@@ -38,13 +38,13 @@ class Player extends Phaser.Physics.Arcade.Sprite {
             //     x: this.width/2,
             //     y: this.height/2,
             // },
-            scale: 1,
+            scale: this.scale,
             // **emitter**
             name: 'Kachow',
             on: false,          // set false to stop emitter
             active: true,      // set false to pause emitter and particles
             frequency: 1,      // -1 for exploding emitter
-            quantity: {min: 0, max: 0},       // { min, max }
+            quantity: {min: 25, max: 35},       // { min, max }
             maxParticles: 0,
             reserve: 15,
             // rotate: this.player.velocityX,           // I want to get it to rotate with the player direction
@@ -56,10 +56,11 @@ class Player extends Phaser.Physics.Arcade.Sprite {
             // radial: true,
             angle: {min: 0, max: 360},
             // velocity
-            speed: {min: 350, max: 425},
+            speed: {min: 125, max: 300},
             acceleration: -500,
             // sprite sheet frames : animation
-            frames: 6,
+            frame: 7,
+            alpha: 1,
             cycle: true
         });
 

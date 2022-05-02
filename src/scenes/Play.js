@@ -69,6 +69,7 @@ class Play extends Phaser.Scene {
         // this.load.image('bullet', './assets/bullet.png');
         
         this.load.image('ocean', './assets/ocean.png');
+        this.load.image('background', './assets/Background.png');
         this.load.image('healthbar', './assets/health.png');
         this.load.image('healthbar-outline', './assets/helfbah.png');
     }
@@ -79,6 +80,11 @@ class Play extends Phaser.Scene {
             frames: this.anims.generateFrameNames('explosion-sheet', {start: 0, end: 9}),
             frameRate: 30
         });
+        this.anims.create({ 
+            key: 'super-explosion',
+            frames: this.anims.generateFrameNumbers('super-explosion', {start: 0, end: 4}),
+            frameRate: 12
+        })
         this.anims.create({
             key: 'player-bullet',
             frames: this.anims.generateFrameNames('bullet', {
@@ -108,8 +114,9 @@ class Play extends Phaser.Scene {
         // });
 
         // Draw Background
+        this.background = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'background').setOrigin(0, 0);
         this.ocean = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'ocean').setOrigin(0, 0);
-        this.ocean.alpha = 0.75;
+        this.ocean.alpha = 0;
 
         // Particle Manager
         this.particles = this.make.particles({
@@ -344,6 +351,7 @@ class Play extends Phaser.Scene {
         this.gameTime = time;
         delta /= 1000; // ms -> s
 
+        // Update background
         this.ocean.tilePositionY -= delta * 200;
 
         this.player.update(delta);

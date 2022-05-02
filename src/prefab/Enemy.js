@@ -68,7 +68,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
             timeScale: 1,
             // repeating values
             // delay: {min: 5, max: 5},
-            lifespan: {min: 180, max: 260},
+            lifespan: {min: 150, max: 300},
             // directionx
             // radial: true,
             angle: {min: 235, max: 305},
@@ -76,8 +76,8 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
             speed: {min: 250, max: 550},
             gravityY: 1500,
             // sprite sheet frames : animation
-            frames: 6,
-            cycle: true
+            frame: 10, //{start: 9, end: 11}
+            cycle: true 
         });
 
         this.scene.enemyExplodinate = this.scene.particles.createEmitter({
@@ -89,22 +89,22 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
             on: false,          // set false to stop emitter
             active: true,      // set false to pause emitter and particles
             frequency: 1,      // -1 for exploding emitter
-            quantity: {min: 0, max: 0},       // { min, max }
+            quantity: {min: 35, max: 45},       // { min, max }
             maxParticles: 0,
             reserve: 15,
             // rotate: this.player.velocityX,           // I want to get it to rotate with the player direction
             timeScale: 1,
             // repeating values
-            delay: {min: 25, max: 55},
-            lifespan: {min: 115, max: 275},
+            delay: {min: 15, max: 35},
+            lifespan: {min: 50, max: 200},
             // directionx
             // radial: true,
             angle: {min: 0, max: 360},
             // velocity
-            speed: {min: 350, max: 425},
-            acceleration: -500,
+            speed: {min: 50*this.scale, max: 150*this.scale},
+            // acceleration: -500,
             // sprite sheet frames : animation
-            frames: 6,
+            frame: 10,
             cycle: true
         });
 
@@ -134,9 +134,10 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
         // Destruction of being if health gets too low
         let boom = this.scene.add.sprite(this.x, this.y, 'healthbar').setOrigin(0.5,0.5);
         this.scene.enemyExplodinate.setPosition(this.x, this.y);
+        this.scene.enemyExplodinate.setScale(this.scale);
         this.scene.enemyExplodinate.start();
-        boom.scale = SCALE*2;
-        boom.anims.play('explosion');
+        boom.scale = 2;
+        boom.anims.play('explosion');           // super-explosion
         this.scene.time.delayedCall(25, () => {
             this.scene.enemyExplodinate.stop();
         });
@@ -180,6 +181,24 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
         });
         if (this.health <= 0) {
             this.explodinate();
+        };
+    }
+
+    findScale() {
+        if (this.texture == 'enemy1') {
+            this.scale = SCALE
+        }
+        else if (this.texture == 'enemy2') {
+            this.scale = SCALE * 2
+        }
+        else if (this.texture == 'enemy3') {
+            this.scale = SCALE * 4
+        }
+        else if (this.texture == 'enemy4') {
+            this.scale = SCALE * 6
+        }
+        else if (this.texture == 'asteroid') {
+            this.scale = SCALE * 2
         };
     }
 }
