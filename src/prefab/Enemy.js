@@ -17,7 +17,7 @@ let animations;
 class Enemy extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y, 
         {
-            texture, startFrame, endFrame, speed, shootInterval, health, damage,
+            texture, startFrame, endFrame, speed, shootInterval, health, damage, score,
             deathFunction=defaultDeathCondition, 
             moveFunction=defaultMovement,
             fireFunction=defaultFire
@@ -38,6 +38,8 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
         // TODO: Add more to enemy config (behaviour)
 
         this.time = 0;
+
+        this.score = score;
 
         scene.add.existing(this);
         scene.physics.add.existing(this);
@@ -147,6 +149,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
             boom.destroy();
         });
         this.remove = true;
+        this.scene.score += this.score;
     };
 
     reset() {       
