@@ -159,7 +159,7 @@ class Play extends Phaser.Scene {
             // Behaviour
             speed: 250,
             shootInterval: 1000000, // This enemy doesn't shoot, so irrelevant number
-            health: 2,
+            health: 5,
             damage: 1,
             // Functions
             moveFunction: defaultMovement,
@@ -247,10 +247,10 @@ class Play extends Phaser.Scene {
         this.addEnemyPoolGroupPair(enemyYellowConfig);
         
         this.time.addEvent({
-            delay: 2500,
+            delay: 4000,
             callback: () => {
                 // TODO: remove special stuff ; make universal
-                this.addEnemyWave(enemyRedConfig, 5, 250);
+                this.addEnemyWave(enemyRedConfig, 5, 500);
             }, 
             loop: true,
             startAt: 5000
@@ -293,6 +293,14 @@ class Play extends Phaser.Scene {
         this.damagebar = this.add.tileSprite(30, 30, game.config.width - 60, 30, 'healthbar', 0).setOrigin(0,0);
         this.damagebar.setTintFill(0xffffff);
         this.healthOutline = this.add.image(30, 30, 'healthbar-outline').setOrigin(0, 0).setScale(SCALE);
+        this.destroyedBarGroup = this.physics.add.group({ 
+            gravityY: 1500,
+            // accelerationY: 500,
+            velocityX: 250,
+            velocityY: -250,
+            // dragX: 2000
+            angularVelocity: 2500,
+        });
 
         this.shakeCount = 0;
         this.shakeIntensity = 0;
@@ -366,6 +374,9 @@ class Play extends Phaser.Scene {
         // Set Z values to highest for healths
         this.children.bringToTop(this.damagebar);
         this.children.bringToTop(this.healthbar);
+        this.destroyedBarGroup.getChildren().forEach((bar) => {
+            this.children.bringToTop(bar);
+        });
         this.children.bringToTop(this.healthOutline);
 
         let cam = this.cameras.main;
@@ -499,7 +510,25 @@ class Play extends Phaser.Scene {
 
     updateHealthBar() {
         let width = (this.game.config.width - 60)
-        this.healthbar.width = width * (this.player.health / this.player.MAXHEALTH);
+        let newWidth = width * (this.player.health / this.player.MAXHEALTH);
+        let damage = -(newWidth - this.healthbar.width);
+        if (newWidth < this.healthbar.width) {
+            let destroyedBar = this.add.tileSprite(30 + newWidth, 30, 
+                damage, 30, 'healthbar', 0).setOrigin(0.5,0.5);
+            destroyedBar.x += destroyedBar.width/2;
+            destroyedBar.y += destroyedBar.height/2;
+            destroyedBar.setTintFill(0x990000);
+            destroyedBar = this.physics.add.existing(destroyedBar);
+            this.destroyedBarGroup.add(destroyedBar);
+            this.time.delayedCall(750, () => {
+                destroyedBar.remove = true;
+                destroyedBar.destroy();
+            }, null, this)
+        }
+        this.healthbar.width = newWidth;
+
+
+
         if (this.damagebar.width < this.healthbar.width) {
             this.damagebar.width = this.healthbar.width;
         }

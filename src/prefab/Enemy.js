@@ -61,7 +61,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
             on: false,          // set false to stop emitter
             active: true,      // set false to pause emitter and particles
             frequency: 1,      // -1 for exploding emitter
-            quantity: {min: 40, max: 60},       // { min, max }
+            quantity: {min: 5, max: 5},       // { min, max }
             maxParticles: 0,
             reserve: 15,
             // rotate: this.player.velocityX,           // I want to get it to rotate with the player direction
@@ -73,8 +73,8 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
             // radial: true,
             angle: {min: 235, max: 305},
             // velocity
-            speed: {min: 350, max: 500},
-            acceleration: -500,
+            speed: {min: 250, max: 550},
+            gravityY: 1500,
             // sprite sheet frames : animation
             frames: 6,
             cycle: true
