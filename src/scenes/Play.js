@@ -53,6 +53,12 @@ class Play extends Phaser.Scene {
             startFrame: 0,
             endFrame: 9
         });
+        this.load.spritesheet('superExplosion-sheet', './assets/explosionado-Sheet.png', {
+            frameWidth: 32,
+            frameHeight: 32,
+            startFrame: 0,
+            endFrame: 4
+        });
         this.load.spritesheet('bullet', './assets/Bullet-Sheet.png', {
             frameWidth: 10,
             frameHeight: 10,
@@ -68,12 +74,17 @@ class Play extends Phaser.Scene {
 
         // this.load.image('bullet', './assets/bullet.png');
         
-        this.load.image('ocean', './assets/ocean.png');
+        // this.load.image('ocean', './assets/ocean.png');
         this.load.image('background', './assets/Background.png');
-        this.load.image('foreground', './assets/Foreground.png');
+        // this.load.image('foreground', './assets/Foreground.png');
+        this.load.image('blobs', './assets/Blobs.png');
         this.load.image('void', './assets/Void.png');
-        this.load.image('clusters', './assets/Mid_Stars.png');
-        this.load.image('galaxy', './assets/Galaxxy.png');
+        this.load.image('stars', './assets/Backstars.png');
+        this.load.image('cluster01', './assets/cluster01.png');
+        this.load.image('cluster02', './assets/cluster02.png');
+        this.load.image('cluster03', './assets/cluster03.png');
+        // this.load.image('clusters', './assets/Mid_Stars.png');
+        // this.load.image('galaxy', './assets/Galaxxy.png');
         this.load.image('healthbar', './assets/health.png');
         this.load.image('healthbar-outline', './assets/helfbah.png');
     }
@@ -86,7 +97,7 @@ class Play extends Phaser.Scene {
         });
         this.anims.create({ 
             key: 'super-explosion',
-            frames: this.anims.generateFrameNumbers('super-explosion', {start: 0, end: 4}),
+            frames: this.anims.generateFrameNumbers('superExplosion-sheet', {start: 0, end: 4}),
             frameRate: 12
         })
         this.anims.create({
@@ -119,8 +130,14 @@ class Play extends Phaser.Scene {
 
         // Draw Background
         this.void = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'void').setOrigin(0, 0);
-        this.clusters = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'clusters').setOrigin(0, 0);
+        this.stars = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'stars').setOrigin(0, 0).setScale(1.5);
+        // add star clusters
+        this.cluster01 = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'cluster01').setOrigin(0, 0);
+        this.cluster02 = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'cluster02').setOrigin(0, 0);
+        this.cluster03 = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'cluster03').setOrigin(0, 0);
+        // add sidebars
         this.background = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'background').setOrigin(0, 0);
+        this.blobs = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'blobs').setOrigin(0, 0);
         // this.galaxy = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'galaxy').setOrigin(0, 0);
         // this.foreground = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'foreground').setOrigin(0, 0);
 
@@ -359,9 +376,18 @@ class Play extends Phaser.Scene {
 
         // Update background
         this.background.tilePositionY -= delta * 150;
-        // this.foreground.tilePositionY -= delta * 200;
-        this.clusters.tilePositionY -= delta * 100;
-        // this.galaxy.tilePositionY -= delta* 50;
+        this.blobs.tilePositionY -= delta * 140;
+        this.stars.tilePositionY -= delta * 50;
+        // Star clusters
+        // this.clusters.tilePositionY -= delta * 100;
+        // this.clusters.tilePositionX -= delta * 50 * sin(0.001 * this.gameTime);
+        this.cluster01.tilePositionY -= delta * 80;
+        this.cluster01.tilePositionX -= delta * 50 * sin(0.0005 * this.gameTime);
+        this.cluster02.tilePositionY -= delta * 50;
+        this.cluster02.tilePositionX += delta * 50 * sin(0.0005 * this.gameTime);
+        this.cluster03.tilePositionY -= delta * 70;
+        this.cluster03.tilePositionX -= delta * 50 * sin(0.0005 * this.gameTime);
+
 
         this.player.update(delta);
         if (this.player.health <= 0) {

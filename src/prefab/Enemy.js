@@ -132,16 +132,17 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     explodinate() {
         // Destruction of being if health gets too low
-        let boom = this.scene.add.sprite(this.x, this.y, 'healthbar').setOrigin(0.5,0.5);
+        let boom = this.scene.add.sprite(this.x, this.y, 'superExplosion-sheet').setOrigin(0.5,0.5);
+        this.findScale();
         this.scene.enemyExplodinate.setPosition(this.x, this.y);
         this.scene.enemyExplodinate.setScale(this.scale);
         this.scene.enemyExplodinate.start();
-        boom.scale = 2;
-        boom.anims.play('explosion');           // super-explosion
+        boom.scale = this.scale;
+        boom.anims.play('super-explosion');           // super-explosion
         this.scene.time.delayedCall(25, () => {
             this.scene.enemyExplodinate.stop();
         });
-        boom.on('animationComplete', () => {
+        boom.on('animationcomplete', () => {
             boom.alpha = 0;
             boom.destroy();
         });
@@ -175,7 +176,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
         let boom = this.scene.add.sprite(this.x, this.y, 'healthbar').setOrigin(0.5,0.5);
         boom.scale = SCALE*2;
         boom.anims.play('explosion');
-        boom.on('animationComplete', () => {
+        boom.on('animationdomplete', () => {
             boom.alpha = 0;
             boom.destroy();
         });
