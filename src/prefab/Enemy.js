@@ -171,7 +171,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
     }
 
     hit(damage) {
-        this.scene.laser.play();
+        this.scene.hit.play();
         this.health -= damage;
         this.setTintFill(0xffffff);
         this.scene.physics.pause();
