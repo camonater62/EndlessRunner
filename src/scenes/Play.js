@@ -59,6 +59,12 @@ class Play extends Phaser.Scene {
             startFrame: 0,
             endFrame: 9
         });
+        this.load.spritesheet('superExplosion-sheet', './assets/explosionado-Sheet.png', {
+            frameWidth: 32,
+            frameHeight: 32,
+            startFrame: 0,
+            endFrame: 4
+        });
         this.load.spritesheet('bullet', './assets/Bullet-Sheet.png', {
             frameWidth: 10,
             frameHeight: 10,
@@ -74,25 +80,32 @@ class Play extends Phaser.Scene {
 
         // this.load.image('bullet', './assets/bullet.png');
         
-        this.load.image('ocean', './assets/ocean.png');
+        // this.load.image('ocean', './assets/ocean.png');
+        this.load.image('background', './assets/Background.png');
+        // this.load.image('foreground', './assets/Foreground.png');
+        this.load.image('blobs', './assets/Blobs.png');
+        this.load.image('void', './assets/Void.png');
+        this.load.image('stars', './assets/Backstars.png');
+        this.load.image('cluster01', './assets/cluster01.png');
+        this.load.image('cluster02', './assets/cluster02.png');
+        this.load.image('cluster03', './assets/cluster03.png');
+        // this.load.image('clusters', './assets/Mid_Stars.png');
+        // this.load.image('galaxy', './assets/Galaxxy.png');
         this.load.image('healthbar', './assets/health.png');
         this.load.image('healthbar-outline', './assets/helfbah.png');
     }
 
     create() {
-
-        this.ocean = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'ocean').setOrigin(0, 0);
-        this.ocean.alpha = 0.75;
-
-        // TODO: Draw Player on top
-        this.player = new Player(this, game.config.width / 2, 3 * game.config.height / 4, 'player', 0, 750).setOrigin(0, 0);
-        this.player.x -= this.player.width / 2;
-
         this.anims.create({
             key: 'explosion',
             frames: this.anims.generateFrameNames('explosion-sheet', {start: 0, end: 9}),
             frameRate: 30
         });
+        this.anims.create({ 
+            key: 'super-explosion',
+            frames: this.anims.generateFrameNumbers('superExplosion-sheet', {start: 0, end: 4}),
+            frameRate: 12
+        })
         this.anims.create({
             key: 'player-bullet',
             frames: this.anims.generateFrameNames('bullet', {
@@ -120,6 +133,35 @@ class Play extends Phaser.Scene {
         //     frameRate: 12,
         //     repeat: -1
         // });
+
+        // Draw Background
+        this.void = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'void').setOrigin(0, 0);
+        this.stars = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'stars').setOrigin(0, 0).setScale(1.5);
+        // add star clusters
+        this.cluster01 = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'cluster01').setOrigin(0, 0);
+        this.cluster02 = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'cluster02').setOrigin(0, 0);
+        this.cluster03 = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'cluster03').setOrigin(0, 0);
+        // add sidebars
+        this.background = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'background').setOrigin(0, 0);
+        this.blobs = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'blobs').setOrigin(0, 0);
+        // this.galaxy = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'galaxy').setOrigin(0, 0);
+        // this.foreground = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'foreground').setOrigin(0, 0);
+
+        // Particle Manager
+        this.particles = this.make.particles({
+            key: 'bullet',
+            add: true,
+            emitters: [
+                // this.emitterConfig0,
+                // ... etc
+            ],
+            alpha: 1
+        });
+
+        // TODO: Draw Player on top
+        this.player = new Player(this, game.config.width / 2, 3 * game.config.height / 4, 'player', 0, 750).setOrigin(0, 0);
+        this.player.x -= this.player.width / 2;
+
 
         this.bulletGroup = this.physics.add.group({
             removeCallback: (bullet) => {
@@ -153,7 +195,7 @@ class Play extends Phaser.Scene {
             // Behaviour
             speed: 250,
             shootInterval: 1000000, // This enemy doesn't shoot, so irrelevant number
-            health: 2,
+            health: 5,
             damage: 1,
             // Functions
             moveFunction: defaultMovement,
@@ -210,7 +252,7 @@ class Play extends Phaser.Scene {
             endFrame: 15,
             // Behaviour
             speed: 150,
-            shootInterval: 800,
+            shootInterval: 1000,
             health: 25,
             damage: 4,
             moveFunction: (enemy, delta) => {
@@ -218,8 +260,8 @@ class Play extends Phaser.Scene {
                 enemy.setVelocityX(enemy.speed * sin(5 * enemy.time))
             },
             fireFunction: (enemy) => { 
-                this.addBullet(1 * enemy.width*0.8 + enemy.x, enemy.y + (enemy.height * SCALE), 400, 'enemy');
-                this.addBullet(-1 * enemy.width*0.8 + enemy.x, enemy.y + (enemy.height * SCALE), 400, 'enemy');
+                this.addBullet(1 * enemy.width*0.9 + enemy.x, enemy.y + (enemy.height * SCALE), 400, 'enemy');
+                this.addBullet(-1 * enemy.width*0.9 + enemy.x, enemy.y + (enemy.height * SCALE), 400, 'enemy');
             },
             deathFunction: defaultDeathCondition,
             score: 100,
@@ -246,16 +288,16 @@ class Play extends Phaser.Scene {
         this.addEnemyPoolGroupPair(enemyYellowConfig);
         
         this.time.addEvent({
-            delay: 750,
+            delay: 4000,
             callback: () => {
                 // TODO: remove special stuff ; make universal
-                this.addEnemyWave(enemyRedConfig, 3, 250);
+                this.addEnemyWave(enemyRedConfig, 5, 500);
             }, 
             loop: true,
             startAt: 5000
         });
         this.time.addEvent({ 
-            delay: 5400,
+            delay: 20000,
             callback: () => {
                 this.addEnemy(asteroidConfig, Math.random() * game.config.width);
             },
@@ -281,20 +323,64 @@ class Play extends Phaser.Scene {
         this.time.addEvent({
             delay: 10000,
             callback: () => {
-                this.addEnemy(enemyYellowConfig, Math.random() * game.config.width);
+                this.addEnemy(enemyYellowConfig, this.player.x);
             }, 
             loop: true,
             startAt: -30000
         });
 
+        // add health bar images
         this.healthbar = this.add.tileSprite(30, 30, game.config.width - 60, 30, 'healthbar', 0).setOrigin(0,0);
         this.damagebar = this.add.tileSprite(30, 30, game.config.width - 60, 30, 'healthbar', 0).setOrigin(0,0);
         this.damagebar.setTintFill(0xffffff);
         this.healthOutline = this.add.image(30, 30, 'healthbar-outline').setOrigin(0, 0).setScale(SCALE);
+        this.destroyedBarGroup = this.physics.add.group({ 
+            gravityY: 1500,
+            // accelerationY: 500,
+            velocityX: 250,
+            velocityY: -250,
+            // dragX: 2000
+            angularVelocity: 2500,
+        });
 
         this.shakeCount = 0;
         this.shakeIntensity = 0;
 
+        this.playerJetStream = this.particles.createEmitter({
+            // x: {min: this.player.x - 5, max: this.player.x + 5},
+            // y: {min: this.player.y - 5, max:this.player.y + 5},
+            x: this.player.x,
+            y: this.player.y,
+            follow: this.player,
+            followOffset: {
+                x: this.player.width/2,
+                y: this.player.height,
+            },
+            scaleY: 3,
+            // **emitter**
+            name: 'Emitter',
+            on: true,          // set false to stop emitter
+            active: true,      // set false to pause emitter and particles
+            frequency: 1,      // -1 for exploding emitter
+            quantity: {min: 40, max: 60},       // { min, max }
+            maxParticles: 0,
+            reserve: 15,
+            rotate: this.player.velocityX,           // I want to get it to rotate with the player direction
+            timeScale: 1,
+            // repeating values
+            // delay: {min: 5, max: 5},
+            lifespan: {min: 50, max: 80},
+            // direction
+            // radial: true,
+            angle: {min: 75, max: 105},
+            // velocity
+            speed: {min: 50, max: 80},
+            // sprite sheet frames : animation
+            frames: 6,
+            cycle: true
+        });
+      
+        // score!!
         this.score = 0;
         let scoreConfig = {
             fontFamily: 'Courier', // TODO better font?
@@ -316,7 +402,20 @@ class Play extends Phaser.Scene {
         this.gameTime = time;
         delta /= 1000; // ms -> s
 
-        this.ocean.tilePositionY -= delta * 200;
+        // Update background
+        this.background.tilePositionY -= delta * 150;
+        this.blobs.tilePositionY -= delta * 140;
+        this.stars.tilePositionY -= delta * 50;
+        // Star clusters
+        // this.clusters.tilePositionY -= delta * 100;
+        // this.clusters.tilePositionX -= delta * 50 * sin(0.001 * this.gameTime);
+        this.cluster01.tilePositionY -= delta * 80;
+        this.cluster01.tilePositionX -= delta * 50 * sin(0.0005 * this.gameTime);
+        this.cluster02.tilePositionY -= delta * 50;
+        this.cluster02.tilePositionX += delta * 50 * sin(0.0005 * this.gameTime);
+        this.cluster03.tilePositionY -= delta * 70;
+        this.cluster03.tilePositionX -= delta * 50 * sin(0.0005 * this.gameTime);
+
 
         this.player.update(delta);
         if (this.player.health <= 0) {
@@ -350,6 +449,9 @@ class Play extends Phaser.Scene {
         // Set Z values to highest for healths
         this.children.bringToTop(this.damagebar);
         this.children.bringToTop(this.healthbar);
+        this.destroyedBarGroup.getChildren().forEach((bar) => {
+            this.children.bringToTop(bar);
+        });
         this.children.bringToTop(this.healthOutline);
 
         let cam = this.cameras.main;
@@ -422,19 +524,21 @@ class Play extends Phaser.Scene {
     }
 
     addEnemyWave(enemyConfig, amount, wait) {
-        let baseX = (Math.random() * this.game.config.width)
-        if (baseX < this.game.config.width * 0.25) {
-            baseX = this.game.config.width * 0.25
-        }
-        else if (baseX > this.game.config.width * .75) {
-            baseX = this.game.config.width * .75
-        }
+        // let baseX = (Math.random() * this.game.config.width)
+        // if (baseX < this.game.config.width * 0.25) {
+        //     baseX = this.game.config.width * 0.25
+        // }
+        // else if (baseX > this.game.config.width * .75) {
+        //     baseX = this.game.config.width * .75
+        // }
+        let baseX = this.game.config.width;
         this.time.addEvent({
             delay: wait,
             callback: () => {
                 // TODO: remove special stuff ; make universal
-                let e = this.addEnemy(enemyConfig, baseX * sin(5 * this.gameTime));
-                e.time = Math.random() * this.gameTime;
+                this.addEnemy(enemyConfig, baseX * Math.random());
+                // let e = this.addEnemy(enemyConfig, baseX * sin(5 * this.gameTime));
+                // e.time = Math.random() * this.gameTime;
             }, 
             repeat: amount,
             startAt: 0
@@ -486,7 +590,25 @@ class Play extends Phaser.Scene {
 
     updateHealthBar() {
         let width = (this.game.config.width - 60)
-        this.healthbar.width = width * (this.player.health / this.player.MAXHEALTH);
+        let newWidth = width * (this.player.health / this.player.MAXHEALTH);
+        let damage = -(newWidth - this.healthbar.width);
+        if (newWidth < this.healthbar.width) {
+            let destroyedBar = this.add.tileSprite(30 + newWidth, 30, 
+                damage, 30, 'healthbar', 0).setOrigin(0.5,0.5);
+            destroyedBar.x += destroyedBar.width/2;
+            destroyedBar.y += destroyedBar.height/2;
+            destroyedBar.setTintFill(0x990000);
+            destroyedBar = this.physics.add.existing(destroyedBar);
+            this.destroyedBarGroup.add(destroyedBar);
+            this.time.delayedCall(750, () => {
+                destroyedBar.remove = true;
+                destroyedBar.destroy();
+            }, null, this)
+        }
+        this.healthbar.width = newWidth;
+
+
+
         if (this.damagebar.width < this.healthbar.width) {
             this.damagebar.width = this.healthbar.width;
         }
