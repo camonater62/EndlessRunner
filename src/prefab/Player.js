@@ -83,7 +83,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         });
 
         this.degrade = this.scene.time.addEvent({
-            delay: 25,
+            delay: 30,
             callback: () => {
                 // Increase Health
                 this.health -= this.regenRate;

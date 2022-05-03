@@ -204,15 +204,15 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
     findScale() {
         let key = this.texture.key;
         if (key == 'enemy1') {
-            this.healadd = 0.1;
+            this.healadd = 0.2;
             return SCALE * 1.2
         }
         else if (key == 'enemy2') {
-            this.healadd = 0.55;
+            this.healadd = 0.7;
             return SCALE * 1.5
         }
         else if (key == 'enemy3') {
-            this.healadd = 1.2;
+            this.healadd = 1.5;
             return SCALE * 2
         }
         else if (key == 'enemy4') {
