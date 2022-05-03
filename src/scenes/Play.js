@@ -71,6 +71,7 @@ class Play extends Phaser.Scene {
             startFrame: 0,
             endFrame: 11
         });
+        this.load.atlas('bullet_atlas', './assets/Bullet-Sheet.png', './assets/bullets.json');
         this.load.spritesheet('asteroid', './assets/Asteroid_White.png', {
             frameWidth: 32,
             frameHeight: 32,
@@ -123,18 +124,24 @@ class Play extends Phaser.Scene {
         })
         this.anims.create({
             key: 'player-bullet',
-            frames: this.anims.generateFrameNames('bullet', {
-                start: 6,
-                end: 8,
+            frames: this.anims.generateFrameNames('bullet_atlas', {
+                prefix: 'blue_',
+                start: 1,
+                end: 3,
+                suffix: '',
+                zeroPad: 4
             }),
             frameRate: 12,
             repeat: -1
         });
         this.anims.create({
             key: 'enemy-bullet',
-            frames: this.anims.generateFrameNumbers('bullet', {
-                start: 9, 
-                end: 11
+            frames:this.anims.generateFrameNames('bullet_atlas', {
+                prefix: 'green_',
+                start: 1,
+                end: 3,
+                suffix: '',
+                zeroPad: 4
             }),
             frameRate: 12,
             repeat: -1
