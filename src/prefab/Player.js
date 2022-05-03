@@ -82,6 +82,22 @@ class Player extends Phaser.Physics.Arcade.Sprite {
             startAt: 250
         });
 
+        this.degrade = this.scene.time.addEvent({
+            delay: 25,
+            callback: () => {
+                // Increase Health
+                this.health -= this.regenRate;
+                this.scene.updateHealthBar();
+                // If health is too much, stop function
+                if (this.health >= this.MAXHEALTH) {
+                    this.health = this.MAXHEALTH;
+                    this.scene.time.removeEvent(this.heal);
+                };
+            },
+            loop: true,
+            startAt: -500
+        });
+
         // this.setCollideWorldBounds(true, game.config.width, game.config.height, 0);
     }
 
@@ -160,21 +176,12 @@ class Player extends Phaser.Physics.Arcade.Sprite {
             this.clearTint();
             this.scene.physics.resume();
         }, null, this);
-        // call to heal player
-        this.heal = this.scene.time.addEvent({
-            delay: 15,
-            callback: () => {
-                // Increase Health
-                this.health += this.regenRate;
-                this.scene.updateHealthBar();
-                // If health is too much, stop function
-                if (this.health >= this.MAXHEALTH) {
-                    this.health = this.MAXHEALTH;
-                    this.scene.time.removeEvent(this.heal);
-                };
-            },
-            loop: true,
-            startAt: -3500
-        });
+    }
+
+    heal(damage) {
+        this.health += damage;
+        if (this.health > this.MAXHEALTH) {
+            this.health = this.MAXHEALTH;
+        }
     }
 }

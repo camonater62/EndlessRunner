@@ -34,6 +34,8 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.damage = damage;
         this.texture = texture;
 
+        this.healadd = 0;
+
         this.deathFunction = deathFunction;
         this.moveFunction = moveFunction;
         // TODO: Add more to enemy config (behaviour)
@@ -158,6 +160,8 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
         });
         this.remove = true;
         this.scene.score += this.score;
+
+        this.scene.player.heal(this.healadd);
     };
 
     reset() {       
@@ -200,18 +204,23 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
     findScale() {
         let key = this.texture.key;
         if (key == 'enemy1') {
+            this.healadd = 0.1;
             return SCALE * 1.2
         }
         else if (key == 'enemy2') {
+            this.healadd = 0.55;
             return SCALE * 1.5
         }
         else if (key == 'enemy3') {
+            this.healadd = 1.2;
             return SCALE * 2
         }
         else if (key == 'enemy4') {
+            this.healadd = 1;
             return SCALE * 2
         }
         else if (key == 'asteroid') {
+            this.healadd = 2.5;
             return SCALE * 1.5
         };
     }

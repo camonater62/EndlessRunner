@@ -230,7 +230,7 @@ class Play extends Phaser.Scene {
             // Behavior
             speed: 80,
             shootInterval: 1000000,
-            health: 15,
+            health: 30,
             damage: 7,
             score: 20,
             // Functions
@@ -589,6 +589,7 @@ class Play extends Phaser.Scene {
             if (bullet.team != 'enemy') {
                 bullet.remove = true;
                 enemy.hit(bullet.damage);
+                this.player.heal(0.5);
                 this.screenshake(10, 1);
             };
         });
@@ -604,7 +605,7 @@ class Play extends Phaser.Scene {
         let width = (this.game.config.width*0.6)
         let newWidth = width * (this.player.health / this.player.MAXHEALTH);
         let damage = -(newWidth - this.healthbar.width);
-        if (newWidth < this.healthbar.width) {
+        if (newWidth < this.healthbar.width && damage >= 2) {
             let destroyedBar = this.add.tileSprite(game.config.width*0.2 + newWidth, 30, 
                 damage, 30, 'healthbar', 0).setOrigin(0.5,0.5);
             destroyedBar.x += destroyedBar.width/2;
@@ -618,27 +619,24 @@ class Play extends Phaser.Scene {
             }, null, this)
         }
         this.healthbar.width = newWidth;
+        this.damagebar.width = newWidth;
 
-
-
-        if (this.damagebar.width < this.healthbar.width) {
-            this.damagebar.width = this.healthbar.width;
-        }
-        this.time.removeEvent(this.depleteBar);
-        this.depleteBar = this.time.addEvent({
-            delay: 15,
-            callback: () => {
-                // Increase Health
-                this.damagebar.width -= 4;
-                // If health is too much, stop function
-                if (this.damagebar.width <= this.healthbar.width) {
-                    this.damagebar.width = this.healthbar.width;
-                    this.time.removeEvent(this.depleteBar);
-                };
-            },
-            loop: true,
-            startAt: -500
-        });
+        // this.time.removeEvent(this.depleteBar);
+        // this.depleteBar = this.time.addEvent({
+        //     delay: 15,
+        //     callback: () => {
+        //         console.log("lekrwoiroewirw")
+        //         // Increase Health
+        //         this.damagebar.width -= 4;
+        //         // If health is too much, stop function
+        //         if (this.damagebar.width <= this.healthbar.width) {
+        //             this.damagebar.width = this.healthbar.width;
+        //             this.time.removeEvent(this.depleteBar);
+        //         };
+        //     },
+        //     loop: true,
+        //     startAt: 0
+        // });
     }
 
     getEnemyConfigIndex(enemyconfig) {
