@@ -75,6 +75,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
             delay: 175,         // 0 for laser!!
             callback: () => {
                 scene.addBullet(this.x + this.width / 2, this.y - 25, -1.5 * speed, 'player');
+                this.scene.laser.play();
             },
             loop: true,
             paused: true,
@@ -124,7 +125,6 @@ class Player extends Phaser.Physics.Arcade.Sprite {
                 this.shootTimer.paused = false;
                 this.shootTimer.callback();
                 this.shootTimer.elapsed = 0;
-                this.scene.laser.play();
             }
         }
         if (keySpace.isUp) {
@@ -137,6 +137,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     }
 
     hit(damage) {
+        this.scene.playerdamage.play();
         this.health -= damage;
         this.scene.time.removeEvent(this.heal, this.increaseHeal);
         this.setTintFill(0xffffff);
@@ -146,6 +147,14 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.scene.physics.pause();
         this.scene.particleStop = this.scene.time.delayedCall(25, () => {
             this.scene.playerHit.stop();
+        });
+
+        let boom = this.scene.add.sprite(this.x + this.width/2, this.y + this.height/2, 'healthbar').setOrigin(0.5,0.5);
+        boom.scale = SCALE*1.5;
+        boom.anims.play('super-explosion');
+        boom.on('animationcomplete', () => {
+            boom.alpha = 0;
+            boom.destroy();
         });
         this.scene.clearTint = this.scene.time.delayedCall(125 +damage*5, () => {
             this.clearTint();

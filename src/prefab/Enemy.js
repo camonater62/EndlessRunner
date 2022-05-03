@@ -32,6 +32,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.speed = speed;
         this.shootInterval = shootInterval;
         this.damage = damage;
+        this.texture = texture;
 
         this.deathFunction = deathFunction;
         this.moveFunction = moveFunction;
@@ -134,13 +135,17 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     explodinate() {
         // Destruction of being if health gets too low
-        let boom = this.scene.add.sprite(this.x, this.y, 'superExplosion-sheet').setOrigin(0.5,0.5);
-        this.findScale();
+        let scale = this.findScale();
+        // Particles
         this.enemyExplodinate.setPosition(this.x, this.y);
-        this.enemyExplodinate.setScale(this.scale);
+        this.enemyExplodinate.setScale(scale/2);
+        this.enemyExplodinate.setLifespan({min: 50, max: 300 + 50*scale});
         this.enemyExplodinate.start();
+        // Screenshake
         this.scene.screenshake(10, 0.5);
-        boom.scale = this.scale;
+        // Explosion animation
+        let boom = this.scene.add.sprite(this.x, this.y, 'superExplosion-sheet').setOrigin(0.5,0.5);
+        boom.scale = scale;
         boom.anims.play('super-explosion');           // super-explosion
         this.scene.time.delayedCall(25, () => {
             this.enemyExplodinate.stop();
@@ -166,7 +171,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
     }
 
     hit(damage) {
-        this.scene.laser.play();
+        this.scene.hit.play();
         this.health -= damage;
         this.setTintFill(0xffffff);
         this.scene.physics.pause();
@@ -181,9 +186,9 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
             this.enemyHit.stop();
         })
         let boom = this.scene.add.sprite(this.x, this.y, 'healthbar').setOrigin(0.5,0.5);
-        boom.scale = SCALE*2;
+        boom.scale = SCALE;
         boom.anims.play('explosion');
-        boom.on('animationdomplete', () => {
+        boom.on('animationcomplete', () => {
             boom.alpha = 0;
             boom.destroy();
         });
@@ -193,20 +198,21 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
     }
 
     findScale() {
-        if (this.texture == 'enemy1') {
-            this.scale = SCALE
+        let key = this.texture.key;
+        if (key == 'enemy1') {
+            return SCALE * 1.2
         }
-        else if (this.texture == 'enemy2') {
-            this.scale = SCALE * 2
+        else if (key == 'enemy2') {
+            return SCALE * 1.5
         }
-        else if (this.texture == 'enemy3') {
-            this.scale = SCALE * 4
+        else if (key == 'enemy3') {
+            return SCALE * 2
         }
-        else if (this.texture == 'enemy4') {
-            this.scale = SCALE * 6
+        else if (key == 'enemy4') {
+            return SCALE * 2
         }
-        else if (this.texture == 'asteroid') {
-            this.scale = SCALE * 2
+        else if (key == 'asteroid') {
+            return SCALE * 1.5
         };
     }
 }

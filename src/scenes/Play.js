@@ -7,6 +7,8 @@ class Play extends Phaser.Scene {
         this.load.audio('hit', './assets/CCHit.wav');
         this.load.audio('laser', './assets/CCLaser1.wav');
         this.load.audio('explode', './assets/CCExplode1.wav');
+        this.load.audio('playerdamage', './assets/CCDamage.wav');
+        this.load.audio('gameover', './assets/CCGameover.wav');
 
         keyDOWN = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
         keyUP = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
@@ -51,11 +53,11 @@ class Play extends Phaser.Scene {
             startFrame: 0,
             endFrame: 0
         });
-        this.load.spritesheet('explosion-sheet', './assets/explosion.png', {
+        this.load.spritesheet('explosion-sheet', './assets/bullethit-Sheet.png', {
             frameWidth: 32,
             frameHeight: 32,
             startFrame: 0,
-            endFrame: 9
+            endFrame: 2
         });
         this.load.spritesheet('superExplosion-sheet', './assets/explosionado-Sheet.png', {
             frameWidth: 32,
@@ -90,7 +92,7 @@ class Play extends Phaser.Scene {
         // this.load.image('clusters', './assets/Mid_Stars.png');
         // this.load.image('galaxy', './assets/Galaxxy.png');
         this.load.image('healthbar', './assets/health.png');
-        this.load.image('healthbar-outline', './assets/helfbah.png');
+        this.load.image('healthbar-outline', './assets/health-bar-outline.png');
 
         this.load.audio('music', './assets/CCMusic.mp3');
     }
@@ -103,14 +105,16 @@ class Play extends Phaser.Scene {
         this.laser = this.sound.add('laser');
         this.hit = this.sound.add('hit');
         this.explode = this.sound.add('explode');
+        this.playerdamage = this.sound.add('playerdamage');
+        this.gameover = this.sound.add('gameover');
         
         this.ocean = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'ocean').setOrigin(0, 0);
         this.ocean.alpha = 0.75;
 
         this.anims.create({
             key: 'explosion',
-            frames: this.anims.generateFrameNames('explosion-sheet', {start: 0, end: 9}),
-            frameRate: 30
+            frames: this.anims.generateFrameNames('explosion-sheet', {start: 0, end: 2}),
+            frameRate: 12
         });
         this.anims.create({ 
             key: 'super-explosion',
@@ -344,10 +348,10 @@ class Play extends Phaser.Scene {
         });
 
         // add health bar images
-        this.healthbar = this.add.tileSprite(game.config.width*0.15, 30, game.config.width*0.7, 30, 'healthbar', 0).setOrigin(0,0);
-        this.damagebar = this.add.tileSprite(game.config.width*0.15, 30, game.config.width*0.7, 30, 'healthbar', 0).setOrigin(0,0);
+        this.healthbar = this.add.tileSprite(game.config.width*0.2, 30, game.config.width*0.6, 30, 'healthbar', 0).setOrigin(0,0);
+        this.damagebar = this.add.tileSprite(game.config.width*0.2, 30, game.config.width*0.6, 30, 'healthbar', 0).setOrigin(0,0);
         this.damagebar.setTintFill(0xffffff);
-        this.healthOutline = this.add.image(30, 30, 'healthbar-outline').setOrigin(0, 0).setScale(SCALE);
+        this.healthOutline = this.add.image(game.config.width*0.2, 30, 'healthbar-outline').setOrigin(0, 0).setScale(SCALE*2);
         this.destroyedBarGroup = this.physics.add.group({ 
             gravityY: 1500,
             // accelerationY: 500,
@@ -437,6 +441,7 @@ class Play extends Phaser.Scene {
                 localStorage.setItem('highScore', highScore);
             }
             this.music.stop();
+            this.gameover.play();
             this.scene.start('menuScene');
         }
 
@@ -592,22 +597,15 @@ class Play extends Phaser.Scene {
             this.updateHealthBar();
             enemy.explodinate();
             this.screenshake(50, 1.5)
-            let boom = this.add.sprite(enemy.x, enemy.y, 'healthbar').setOrigin(0.5,0.5);
-            boom.scale = SCALE*2;
-            boom.anims.play('explosion');
-            boom.on('animationComplete', () => {
-                boom.alpha = 0;
-                boom.destroy();
-            });
         });
     }
 
     updateHealthBar() {
-        let width = (this.game.config.width*0.7)
+        let width = (this.game.config.width*0.6)
         let newWidth = width * (this.player.health / this.player.MAXHEALTH);
         let damage = -(newWidth - this.healthbar.width);
         if (newWidth < this.healthbar.width) {
-            let destroyedBar = this.add.tileSprite(game.config.width*0.15 + newWidth, 30, 
+            let destroyedBar = this.add.tileSprite(game.config.width*0.2 + newWidth, 30, 
                 damage, 30, 'healthbar', 0).setOrigin(0.5,0.5);
             destroyedBar.x += destroyedBar.width/2;
             destroyedBar.y += destroyedBar.height/2;
