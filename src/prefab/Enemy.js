@@ -149,10 +149,10 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
         boom.anims.play('super-explosion');           // super-explosion
         this.scene.time.delayedCall(25, () => {
             this.enemyExplodinate.stop();
+            this.scene.explode.play();
         });
         boom.on('animationcomplete', () => {
        
-            this.scene.explode.play();
             boom.alpha = 0;
             boom.destroy();
         });

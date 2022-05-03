@@ -17,6 +17,7 @@ class Menu extends Phaser.Scene {
     create() {
 
         this.keyEnter = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+        keySpace = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
         this.anims.create({
             key: 'menu',
@@ -36,6 +37,10 @@ class Menu extends Phaser.Scene {
         let ratio = game.config.width / game.config.height;
         this.scale.displaySize.setAspectRatio( ratio );
         this.scale.refresh();
+
+        keySpace.on('down', () => {
+            this.scene.start('playScene');
+        });
     }
 
     update() {
