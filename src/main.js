@@ -8,7 +8,12 @@ Creative tilt justification:
                types of enemies without requiring a separate class for each one. We also use
                object pooling for objects that get created/deleted often (bullets & enemies)
                keeping performance high by reducing costly constructor and destructor calls.
-    Visual Style: 
+    Visual Style: The assets of all the sprites and backgrounds all follow a distinct color palette,
+                which is very nice to look at with your eyes. There are lots of nifty little visual
+                effects, such as screenshake, freeze frame, particle effects, health bar shattering,
+                explosion effects, and the like which when combined create a very satisfying feeling
+                of game juice. Plus, the game look is very retro with all the assets being pixellated,
+                and the main menu really lends itself to that look as well.
 */
 
 /** @type {import("../typings/phaser")} */
