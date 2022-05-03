@@ -177,7 +177,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.scene.physics.pause();
         this.enemyHit.setPosition(this.x, this.y + this.height*0.8);
         this.enemyHit.start();
-        this.scene.clearTint = this.scene.time.delayedCall(125, () => {
+        this.clearTintCall = this.scene.time.delayedCall(125, () => {
             this.clearTint();
             this.enemyHit.stop();
         }, null, this);
