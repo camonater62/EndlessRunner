@@ -30,7 +30,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
             frameRate: 12
         });
 
-        this.scene.playerHit = this.scene.particles.createEmitter({
+        this.playerHit = this.scene.particles.createEmitter({
             x: this.x,
             y: this.y,
             // follow: this,
@@ -141,12 +141,12 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.health -= damage;
         this.scene.time.removeEvent(this.heal, this.increaseHeal);
         this.setTintFill(0xffffff);
-        this.scene.playerHit.setPosition(this.x + this.width/2, this.y + this.height/2)
-        this.scene.playerHit.setQuantity({min:65, max: 75})//this.particleBase*(damage+10)
-        this.scene.playerHit.start();
+        this.playerHit.setPosition(this.x + this.width/2, this.y + this.height/2)
+        this.playerHit.setQuantity({min:65, max: 75})//this.particleBase*(damage+10)
+        this.playerHit.start();
         this.scene.physics.pause();
-        this.scene.particleStop = this.scene.time.delayedCall(25, () => {
-            this.scene.playerHit.stop();
+        this.particleStop = this.scene.time.delayedCall(25, () => {
+            this.playerHit.stop();
         });
 
         let boom = this.scene.add.sprite(this.x + this.width/2, this.y + this.height/2, 'healthbar').setOrigin(0.5,0.5);
@@ -156,7 +156,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
             boom.alpha = 0;
             boom.destroy();
         });
-        this.scene.clearTint = this.scene.time.delayedCall(125 +damage*5, () => {
+        this.clearTintCall = this.scene.time.delayedCall(125 +damage*5, () => {
             this.clearTint();
             this.scene.physics.resume();
         }, null, this);
