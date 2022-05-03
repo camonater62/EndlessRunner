@@ -220,7 +220,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
             return SCALE * 2
         }
         else if (key == 'asteroid') {
-            this.healadd = 2.5;
+            this.healadd = 3;
             return SCALE * 1.5
         };
     }
