@@ -333,7 +333,7 @@ class Play extends Phaser.Scene {
         this.time.addEvent({
             delay: 5000,          // 5000
             callback: () => {
-                this.addEnemy(enemyBlueConfig, Math.random() * game.config.width/2);
+                this.addEnemy(enemyBlueConfig, Math.random() * game.config.width/2 + game.config.width/4);
             }, 
             loop: true,
             startAt: -10000     // -10000
